@@ -1,0 +1,147 @@
+/* Split screen layout */
+.split-screen {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Left panel with image */
+.left-panel {
+  flex: 1.071;
+  overflow: hidden;
+}
+
+.left-panel img {
+  width: 100%;
+ height: 90%;
+  object-fit: cover;
+}
+
+/* Right panel with form */
+.right-panel {
+  height: 90%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f6f8;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* OTP container */
+.otp-container {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  text-align: center;
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Title */
+.otp-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #0a0a0a;
+}
+
+/* Form */
+.otp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Label */
+label {
+  font-size: 14px;
+  text-align: left;
+  color: #333;
+}
+
+/* Input */
+input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #1877f2;
+  outline: none;
+}
+
+/* Button */
+.otp-btn {
+  background-color: #1877f2;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.otp-btn:hover {
+  background-color: #145dbf;
+}
+
+/* Error */
+.error {
+  color: red;
+  font-size: 0.9em;
+  margin-top: -6px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+/* Success */
+.success-message {
+  color: green;
+  font-size: 1em;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .split-screen {
+    flex-direction: column;
+  }
+
+  .left-panel {
+    display: none;
+  }
+
+  .right-panel {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .otp-container {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .otp-title {
+    font-size: 1.3rem;
+  }
+
+  .otp-btn {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}

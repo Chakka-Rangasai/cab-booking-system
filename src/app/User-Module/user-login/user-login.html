@@ -1,0 +1,40 @@
+<div class="split-screen">
+  <div class="left-panel">
+    <img src="/Images/img1.png" alt="Login Background" />
+  </div>
+
+  <div class="right-panel">
+    <div class="login-container">
+      <h2 class="login-title">User Login</h2>
+
+      <form class="login-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <label >Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Enter your username"
+          required
+          [(ngModel)]="userLoginObj.userName"  />
+
+        <label >Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+          [(ngModel)]="userLoginObj.userPassword"
+        />
+
+        <button type="submit" class="btn login-btn">Login</button>
+
+        <div class="login-footer">
+          <a (click)="onClickForgotPassword()">Forgot Password</a>
+          <span> | </span>
+          <a (click)="onClickRegister()">Create New Account</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

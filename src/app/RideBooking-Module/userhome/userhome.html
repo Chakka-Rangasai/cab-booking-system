@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="left-panel">
+    <img src="/Images/userhome.png" alt="Cab Image">
+  </div>
+  <div class="right-panel">
+    <div class="booking-form">
+      <h2>Book Your Ride</h2>
+      <div class="search-container">
+  <label for="origin">Pickup Location</label>
+  <input
+    id="origin"
+    type="text" 
+    [(ngModel)]="originQuery"
+    (input)="searchOrigin()" 
+    placeholder="Enter origin"
+    class="form-control"
+  />
+  <ul *ngIf="originSuggestions.length">
+    <li
+      *ngFor="let suggestion of originSuggestions; trackBy: trackById"
+      (mousedown)="onSelectOrigin($event, suggestion)"
+    >
+      {{ suggestion.place_name }}
+    </li>
+  </ul>
+</div>
+
+<button (click)="useCurrentLocation()">Use Current Location</button>
+
+<div class="search-container">
+  <label for="destination">Drop Location</label>
+  <input
+    id="destination"
+    type="text"
+    [(ngModel)]="destinationQuery"
+    (input)="searchDestination()"
+    placeholder="Enter destination"
+    class="form-control"
+  />
+  <ul *ngIf="destinationSuggestions.length">
+    <li
+      *ngFor="let suggestion of destinationSuggestions; trackBy: trackById"
+      (mousedown)="onSelectDestination($event, suggestion)"
+    >
+      {{ suggestion.place_name }}
+    </li>
+  </ul>
+</div>
+
+<button (click)="bookRide()">Confirm Pickup</button>
+<div class="error">{{ error }}</div>

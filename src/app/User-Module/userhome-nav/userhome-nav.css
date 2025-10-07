@@ -1,0 +1,102 @@
+body {
+  height: 100%;
+  width: 100%;
+  font-family: 'Segoe UI', sans-serif;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* background: linear-gradient(180deg,rgb(34, 125, 170),rgb(59, 88, 183));semi-transparent blue */
+  padding: 16px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px); /* glassy effect */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height:40px;
+  background-color: #1A2B4C;
+}
+ 
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo::before {
+  content: '';
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+  background-image: url('/Images/cabIconNav.png'); /* Replace with your actual logo path */
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+}
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li a {
+  text-decoration: none;       /* ✅ Removes underline */
+  color: white;                /* ✅ Makes text white */
+  font-weight: 500;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.nav-links li a:hover{
+  text-decoration: underline;
+  color: white; 
+  
+}
+
+.logout-btn {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.logout-btn img {
+  width: 20px; /* Adjust size as needed */
+  height: 20px;
+  object-fit: contain;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* spacing between links and button */
+}
+
+
+/* footer  */
+
+.app-footer{
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background: #1A2B4C;
+    color: white;
+    border-top: 1px solid #ddd;
+    font-size: 17px;
+    border-radius: 4px;
+ }
+ 

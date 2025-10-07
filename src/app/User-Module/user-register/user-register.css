@@ -1,0 +1,181 @@
+/* Split screen layout */
+.split-screen {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+   margin-bottom: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Left panel with image */
+.left-panel {
+  flex: 1.071;
+  overflow: hidden;
+}
+
+.left-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Right panel with registration form */
+.right-panel {
+height: auto;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f6f8;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Registration container */
+.register-container {
+  width: 100%;
+  max-width: 375px;
+  padding-bottom: 14px;
+  padding-left: 30px;
+  padding-right: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+/* Title */
+.register-title {
+  font-size: 1.4rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+/* Form */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.register-form label {
+  text-align: left;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 0.9rem;
+}
+
+.register-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.register-form input:focus {
+  box-shadow: 0 0 5px #2980b9;
+  outline: none;
+}
+
+/* Validation Feedback */
+.register-form input.ng-invalid.ng-touched {
+  border-color: #e74c3c;
+  background-color: #fdecea;
+}
+
+.register-form input.ng-valid.ng-touched {
+  border-color: #2ecc71;
+  background-color: #eafaf1;
+}
+
+/* Error Messages */
+.error {
+  color: #e74c3c;
+  font-size: 0.75rem;
+  margin-top: 2px;
+  min-height: 16px; /* Reserve space to prevent layout shift */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  display: block;
+}
+
+.register-form input.ng-invalid.ng-touched ~ .error {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Register Button */
+.register-btn {
+  padding: 10px;
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register-btn:hover {
+  background-color: #145dbf;
+  transform: scale(1.02);
+}
+
+.register-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.2);
+}
+
+/* Footer */
+.register-footer {
+  margin-top: 15px;
+  font-size: 0.85rem;
+  color: #34495e;
+  text-align: center;
+}
+
+.register-footer a {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 5px;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.register-footer a:hover {
+  color: #145dbf;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .split-screen {
+    flex-direction: column;
+  }
+
+  .left-panel {
+    display: none;
+  }
+
+  .right-panel {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .register-container {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .register-title {
+    font-size: 1.3rem;
+  }
+
+  .register-btn {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}

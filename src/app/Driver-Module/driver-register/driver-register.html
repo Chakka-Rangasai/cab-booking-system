@@ -1,0 +1,67 @@
+<div class="page-wrapper">
+  <div class="driver-container">
+    <h2 class="driver-title">Driver Registration</h2>
+
+    <form class="driver-form" (ngSubmit)="onRegisterDriver()" #driverForm="ngForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" [(ngModel)]="username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" [(ngModel)]="email" required email />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" [(ngModel)]="password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="mobile">Mobile</label>
+          <input type="tel" id="mobile" name="mobile" [(ngModel)]="mobile" required pattern="^[6-9][0-9]{9}$" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="licenseId">Driver License ID</label>
+          <input type="text" id="licenseId" name="licenseId" [(ngModel)]="licenseId" required />
+        </div>
+
+        <div class="form-group">
+          <label for="vehicleNumber">Vehicle Number</label>
+          <input type="text" id="vehicleNumber" name="vehicleNumber" [(ngModel)]="vehicleNumber" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="vehicleModel">Vehicle Model</label>
+          <input type="text" id="vehicleModel" name="vehicleModel" [(ngModel)]="vehicleModel" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="vehicleDetails">Upload Vehicle Details (PDF)</label>
+          <input type="file" id="vehicleDetails" name="vehicleDetails" accept=".pdf" required (change)="onFileSelected($event)" />
+        </div>
+      </div>
+
+      <button type="submit" class="driver-btn" [disabled]="driverForm.invalid">Register</button>
+    </form>
+
+    <!-- Login Button Section -->
+    
+<div class="login-section">
+  <p>Already have an account?</p>
+  <a routerLink="driverlogin" class="btn user-btn" (click)="onDriverLoginBtn()">Login</a>
+</div>
+
+
+

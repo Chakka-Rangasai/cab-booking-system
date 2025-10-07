@@ -1,0 +1,135 @@
+.dashboard {
+  padding: 40px;
+  background: #f0f4f8;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+ 
+.dashboard h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #1A2B4C;
+}
+ 
+/* Profile Section */
+.profile {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+ 
+.profile h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+ 
+.profile p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+ 
+.profile img {
+  width: 180px;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+ 
+/* Availability Toggle */
+.availability {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+  font-size: 18px;
+}
+ 
+.availability input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+ 
+/* Ride Requests */
+.ride-requests {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+ 
+.ride-requests h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+ 
+.ride-card {
+  background: #eaf2ff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+ 
+.ride-card p {
+  margin: 6px 0;
+  font-size: 16px;
+}
+ 
+.ride-card button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+ 
+.ride-card button:first-of-type {
+  background: linear-gradient(135deg, #4caf50, #81c784);
+  color: white;
+}
+ 
+.ride-card button:last-of-type {
+  background: linear-gradient(135deg, #f44336, #e57373);
+  color: white;
+}
+ 
+.ride-card button:hover {
+  opacity: 0.9;
+}
+ 
+/* Ride History */
+.ride-history {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+ 
+.ride-history h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+ 
+.ride-history ul {
+  list-style: none;
+  padding-left: 0;
+}
+ 
+.ride-history li {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+}
+ 
+.ride-history li:last-child {
+  border-bottom: none;
+}
+ 

@@ -1,0 +1,86 @@
+<div class="split-screen">
+  <div class="left-panel">
+    <img src="/Images/img1.png" alt="Registration Background" />
+  </div>
+
+  <div class="right-panel">
+    <div class="register-container">
+      <h2 class="register-title">User Registration</h2>
+
+      <form class="register-form" #registerForm="ngForm" (ngSubmit)="onRegister(registerForm)">
+        <!-- Username -->
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="user.userName"
+          required
+          #username="ngModel"
+        />
+        <div *ngIf="username.invalid && username.touched" class="error">
+          <span *ngIf="username.errors?.['required']">Username is required.</span>
+        </div>
+
+        <!-- Email -->
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="user.userEmail"
+          required
+          pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+          #email="ngModel"
+        />
+        <div *ngIf="email.invalid && email.touched" class="error">
+          <span *ngIf="email.errors?.['required']">Email is required.</span>
+          <span *ngIf="email.errors?.['pattern']">Enter a valid Gmail address.</span>
+        </div>
+
+        <!-- Mobile -->
+        <label for="mobile">Mobile</label>
+        <input
+          type="tel"
+          id="mobile"
+          name="mobile"
+          [(ngModel)]="user.userPhoneNumber"
+          required
+          pattern="^[0-9]{10}$"
+          #mobile="ngModel"
+        />
+        <div *ngIf="mobile.invalid && mobile.touched" class="error">
+          <span *ngIf="mobile.errors?.['required']">Mobile number is required.</span>
+          <span *ngIf="mobile.errors?.['pattern']">Enter a valid 10-digit mobile number.</span>
+        </div>
+
+        <!-- Password -->
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="user.userPassword"
+          required
+          minlength="6"
+          #password="ngModel"
+        />
+        <div *ngIf="password.invalid && password.touched" class="error">
+          <span *ngIf="password.errors?.['required']">Password is required.</span>
+          <span *ngIf="password.errors?.['minlength']">Password must be at least 6 characters.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="register-btn" [disabled]="registerForm.invalid">Register</button>
+      </form>
+
+      <!-- Footer -->
+      <div class="register-footer">
+        <p>Already have an account?</p>
+        <nav>
+          <a routerLink="userlogin" class="btn user-btn" (click)="onuserloginbtn()">Login</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

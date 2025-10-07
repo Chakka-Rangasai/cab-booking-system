@@ -1,0 +1,42 @@
+<div class="split-screen">
+  <!-- Left Panel with Image -->
+  <div class="left-panel">
+    <img src="/Images/Driverimg.png" alt="OTP Verification Background" />
+  </div>
+
+  <!-- Right Panel with Form -->
+  <div class="right-panel">
+    <div class="otp-container">
+      <h2 class="otp-title">Enter OTP</h2>
+
+      <form class="otp-form" #otpForm="ngForm" (ngSubmit)="onValidateOtp()">
+        <label for="otp">OTP</label>
+        <input
+          type="text"
+          id="otp"
+          name="otp"
+          [(ngModel)]="enteredOtp"
+          required
+          minlength="6"
+          maxlength="6"
+          #otpField="ngModel"
+        />
+        <div class="error" *ngIf="otpField.invalid && otpField.touched">
+          <span *ngIf="otpField.errors?.['required']">OTP is required.</span>
+          <span *ngIf="otpField.errors?.['minlength'] || otpField.errors?.['maxlength']">OTP must be 6 digits.</span>
+        </div>
+
+        <div class="error" *ngIf="otpInvalid">
+          <span>Invalid OTP. Please try again.</span>
+        </div>
+
+        <button type="submit" class="otp-btn" [disabled]="otpForm.invalid">Validate OTP</button>
+      </form>
+
+      <div *ngIf="otpValid" class="success-message">
+        <p>OTP validated successfully! Redirecting...</p>
+      </div>
+    </div>
+  </div>
+</div>
+

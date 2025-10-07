@@ -1,0 +1,157 @@
+.hero{
+  border-radius: 5px;
+}
+
+.hero-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: -20px;
+  margin-top: 1px;
+  padding-left: 5em;
+  background: radial-gradient(circle, #eaf4ff, #cce0ff);
+    border-radius: 10px;
+    
+}
+
+.hero-text-content h1 {
+  margin-top: -30px;
+    font-size: 3.5rem; 
+    line-height: 1.1;
+}
+
+.hero-text p {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    font-size: 1.50rem;
+    color: black;
+}
+.hero-text img {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
+}
+
+
+.btn.user-btn {
+  background-color: #007BFF; /* Blue background */
+  color: white;              /* White text */
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* Features Section */
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  margin-top: 40px;
+  /* background-color: radial-gradient(circle, #eaf4ff, #cce0ff); */
+  flex-wrap: wrap;
+}
+
+.feature-box {
+  background: radial-gradient(circle, #eaf4ff, #cce0ff);
+   border: 2px solid #262525; 
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 250px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.feature-box:hover {
+  transform: scale(1.05);
+}
+.feature-box img {
+  width: 80px;
+  height: auto;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+
+.feature-box h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.feature-box p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.reviews-section {
+  padding: 2rem;
+  text-align: center;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.reviews-section h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.reviews-scroll-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.reviews-container {
+  display: flex;
+  gap: 2rem;
+  animation: scrollReviews 40s linear infinite;
+  width: fit-content;
+}
+
+.review-box {
+  border: 2px solid #262525; /* Thicker border */
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 250px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  background-color: #fff; /* Optional: keeps it clean */
+}
+
+
+.review-box p {
+  font-size: 0.95rem;
+  color: #000;
+}
+
+@keyframes scrollReviews {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Adjusted to prevent full disappearance */
+}
+
+
+
+
+
+
+
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
