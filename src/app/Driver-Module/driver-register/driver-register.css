@@ -1,0 +1,156 @@
+/* Wrapper to center the container */
+.page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #ffffff; /* Changed background to white */
+  box-sizing: border-box;
+}
+
+/* Container with reduced height and no scrollbar */
+.driver-container {
+  background-color: #fff;
+  padding: 20px; /* Reduced padding */
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 700px;
+  box-sizing: border-box;
+  max-height: none; /* Removed height restriction */
+  overflow: visible; /* Removed scrollbar */
+}
+
+/* Title styling */
+.driver-title {
+  font-size: 22px; /* Slightly reduced font size */
+  font-weight: 600;
+  margin-bottom: 16px; /* Reduced margin */
+  text-align: center;
+  color: #0a0a0a;
+}
+
+/* Form layout */
+.driver-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Reduced gap */
+}
+
+/* Row layout */
+.form-row {
+  display: flex;
+  gap: 16px; /* Reduced gap */
+  flex-wrap: wrap;
+}
+
+/* Group layout */
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  flex: 1 1 100%;
+}
+
+/* Label styling */
+label {
+  font-size: 13px; /* Slightly reduced font size */
+  margin-bottom: 4px; /* Reduced margin */
+  color: #333;
+}
+
+/* Input styling */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="file"] {
+  padding: 8px; /* Reduced padding */
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px; /* Slightly reduced font size */
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #1877f2;
+  outline: none;
+  box-shadow: 0 0 5px rgba(24, 119, 242, 0.5);
+}
+
+/* Button styling */
+.driver-btn {
+  background-color: #1877f2;
+  color: white;
+  padding: 10px; /* Reduced padding */
+  border: none;
+  border-radius: 6px;
+  font-size: 15px; /* Slightly reduced font size */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.driver-btn:hover {
+  background-color: #145dbf;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .driver-container {
+    padding: 16px;
+  }
+
+  .driver-title {
+    font-size: 18px;
+  }
+
+  .driver-btn {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+/* Login Section */
+.login-section {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 1rem;
+  color: #34495e;
+  animation: fadeInLogin 1s ease-in-out;
+}
+
+@keyframes fadeInLogin {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-section a {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 5px;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.login-section a:hover {
+  color: #145dbf;
+  text-decoration: underline;
+}
+
+
+
+
+

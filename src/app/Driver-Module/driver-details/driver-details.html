@@ -1,0 +1,58 @@
+<div class="dashboard">
+  <h2>Welcome, {{ driver.name }}</h2>
+ 
+  <!-- Driver Profile -->
+  <section class="profile">
+    <h3>Profile Details</h3>
+    <p><strong>Mobile No:</strong> {{ driver.mobile }}</p>
+    <p><strong>Vehicle ID:</strong> {{ driver.vehicleId }}</p>
+    <p><strong>License ID:</strong> {{ driver.licenseId }}</p>
+    <img [src]="driver.licensePic" alt="License Photo" />
+    <p><strong>Aadhaar ID:</strong> {{ driver.aadhaarId }}</p>
+    <img [src]="driver.aadhaarPic" alt="Aadhaar Photo" />
+  </section>
+ 
+  <!-- Availability Toggle -->
+  <section class="availability">
+  <label>
+    <input type="checkbox" [(ngModel)]="driver.isAvailable" />
+    {{ driver.isAvailable ? 'Available for Rides' : 'Not Available' }}
+  </label>
+</section>
+ 
+<!-- Incoming Ride Requests -->
+@if (driver.isAvailable && rideRequests.length > 0) {
+  <section class="ride-requests">
+    <h3>Incoming Ride Requests</h3>
+    @for (ride of rideRequests; track $index) {
+      <div class="ride-card">
+        <p><strong>Pickup:</strong> {{ ride.pickup }}</p>
+        <p><strong>Drop:</strong> {{ ride.drop }}</p>
+        <p><strong>Cost:</strong> {{ ride.fare }}</p>
+        <button (click)="acceptRide(ride)">Accept</button>
+        <button (click)="rejectRide(ride)">Reject</button>
+      </div>
+    }
+  </section>
+}
+ 
+ 
+ 
+  <!-- Ride History -->
+  <section class="ride-history">
+    <h3>Previous Rides</h3>
+    <ul>
+      @for (history of rideHistory ; track $index) {
+        <li>
+          {{ history.date }} - {{ history.pickup }} to {{ history.drop }} (₹{{ history.fare }})
+        </li>
+      }
+    </ul>
+  </section>
+ 
+    <!-- Logout Button at the Bottom -->
+ <button class="logout-btn" (click)="logout()">Logout</button>
+ 
+ 
+</div>
+ 

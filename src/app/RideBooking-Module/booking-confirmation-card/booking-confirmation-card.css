@@ -1,0 +1,114 @@
+/* Prevent page scrolling */
+body {
+  overflow: hidden;
+}
+
+.booking-card {
+  /* margin-top: 5px; */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3), 
+              0 5px 15px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
+  margin: 20px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+/* Add decorative elements */
+.booking-card::before {
+  content: '';
+  position: absolute;
+  /* top: -50%; */
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+h2 {
+  text-align: center;
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+  margin: 25px 0;
+  border-radius: 2px;
+}
+
+.card-section {
+  color: white;
+  margin-bottom: 18px;
+  font-size: 16px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* .card-section:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(5px);
+} */
+
+.card-section strong {
+  color: #fff;
+  font-weight: 600;
+  display: inline-block;
+  min-width: 130px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Add icons for different sections */
+.card-section:nth-child(3)::before { content: '👨‍✈️ '; }
+.card-section:nth-child(4)::before { content: '🚗 '; }
+.card-section:nth-child(5)::before { content: '📍 '; }
+.card-section:nth-child(6)::before { content: '🎯 '; }
+.card-section:nth-child(7)::before { content: '🚙 '; }
+.card-section:nth-child(8)::before { content: '📏 '; }
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .booking-card {
+    margin: 10px;
+    padding: 20px;
+    max-width: 90%;
+  }
+  
+  .card-section {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+}
+
+
+

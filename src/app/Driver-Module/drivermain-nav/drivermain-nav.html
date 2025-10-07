@@ -1,0 +1,20 @@
+<nav class="navbar">
+  <div class="logo">TAXIWALA</div>
+
+  <div class="nav-actions">
+    <ul class="nav-links">
+      <li><a routerLink="/">Profile</a></li>
+    </ul>
+    <button class="logout-btn" (click)="logout()">
+      <img src="/Images/log-out.png" alt="Logout" />
+      Logout
+    </button>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>
+
+<footer class="app-footer">
+    <p>&copy; 2025 Taxiwala | All rights reserved.</p>
+</footer>
+ 
