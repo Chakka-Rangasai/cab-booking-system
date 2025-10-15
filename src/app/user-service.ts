@@ -7,14 +7,12 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
- 
+  token: string | null = null
   responseMessage: string = '';
   userUpdatePassword:any={
      userId:null,
      userPassword:null
   }
- 
- 
   constructor(private httpClient :HttpClient){}
  
   getUserDetailsObj(userObj1: any) {
@@ -25,15 +23,27 @@ export class UserService {
 }
  
  
-loginValidation(userLoginObj: any): Observable<HttpResponse<{ message: string }>> {
-  return this.httpClient.post<{ message: string }>(
+loginValidation(userLoginObj: any): Observable<HttpResponse<{ token: string; message: string ,user:any}>> {
+  return this.httpClient.post<{ token: string; message: string ,user:any}>(
     "http://localhost:8080/validatelogindetails",
     userLoginObj,
     {
       observe: 'response'
     }
+  ).pipe(
+    tap(response => {
+    const token = response.body?.token;
+    const user = response.body?.user;
+if (token) {
+  localStorage.setItem('jwtToken', token); // Store token for later use
+  this.token = token; // Optional: keep in memory
+}
+
+if (user) {
+  localStorage.setItem('userProfileDetails', JSON.stringify(user));
+}
+    })
   );
- 
 }
  forgetPasswordCredentials(userForgotPasswordObj: any): Observable<HttpResponse<{ message: string, user_id?: string }>> {
     return this.httpClient.post<{ message: string, user_id?: string }>(
@@ -63,6 +73,32 @@ loginValidation(userLoginObj: any): Observable<HttpResponse<{ message: string }>
     }
   );
 }
+
+updateUserProfile(userProileObj:any): Observable<HttpResponse<{ message: string }>> {
+  const token = this.getToken();
+  
+  return this.httpClient.put<{ message: string }>(
+    'http://localhost:8080/edituserprofile',
+    userProileObj,
+    {
+      observe: 'response',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+}
+
+getToken(): string | null {
+  return localStorage.getItem('jwtToken');
+}
+
+removeToken() {
+  // Remove the JWT token from localStorage
+  localStorage.removeItem('jwtToken');
+  localStorage.removeItem('userProfileDetails');
+}
+
 }
  
  

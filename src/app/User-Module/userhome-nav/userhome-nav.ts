@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
+import { UserService } from '../../user-service';
 // import { AvatarModule } from 'primeng/avatar';
 // import { AvatarGroupModule } from 'primeng/avatar-group';
 
@@ -11,13 +12,13 @@ import { RouterLink, RouterOutlet, Router } from '@angular/router';
 })
 export class UserhomeNav {
 
-  constructor(private router: Router){
+  constructor(private router: Router,private userService:UserService){
   }
 
   logout() {
-
+  this.userService.removeToken();
   console.log('Logging out...');
-  this.router.navigate(['/main/']);
+  this.router.navigate(['/main']);
 }
 
 }

@@ -22,6 +22,8 @@ import { Main } from './Home-Module/main/main';
 import { Home } from './Home-Module/home/home';
 import { DrivermainNav } from './Driver-Module/drivermain-nav/drivermain-nav';
 import { Tripdetails } from './RideBooking-Module/tripdetails/tripdetails';
+import { UserProfile } from './User-Module/user-profile/user-profile';
+import { AuthGuard } from './auth-guard';
 // import { UserProfile } from './user-profile/user-profile';
 export const routes: Routes = [
     {
@@ -83,10 +85,12 @@ export const routes: Routes = [
      {
     path: 'userhomenav',
     component: UserhomeNav,
+    canActivate:[AuthGuard],
     children: [
       { path: '', component: Userhome }, // default child route
       { path: 'cnf-booking', component: Cnfbooking },
       {path:'tripdetails',component:Tripdetails},
+      {path:'userprofile',component:UserProfile},
       { path:'booking-confirmation',component:BookingConfirmationCard}
     ]
   },
