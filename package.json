@@ -41,6 +41,7 @@
     "@angular/compiler-cli": "^20.1.0",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
+    "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^20.17.19",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
