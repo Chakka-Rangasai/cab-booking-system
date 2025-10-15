@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { UserRegister } from './User-Module/user-register/user-register';
 import { DriverRegister } from './Driver-Module/driver-register/driver-register';
 import { UserLogin } from './User-Module/user-login/user-login';
-import { Driverlogin } from './Driver-Module/driverlogin/driverlogin';
+import { DriverLoginComponent } from './Driver-Module/driverlogin/driverlogin';
 import { Userhome } from './RideBooking-Module/userhome/userhome';
 import { UserResetPassword } from './User-Module/user-reset-password/user-reset-password';
 import { UserEnterOtp } from './User-Module/user-enter-otp/user-enter-otp';
@@ -45,7 +45,7 @@ export const routes: Routes = [
         path:"userresetpassword",component: UserResetPassword
     },
     {
-        path:'driverlogin',component:Driverlogin
+        path:'driverlogin',component:DriverLoginComponent
     },
     {
         path:'driverresetpassword',component:DriverResetPassword
@@ -89,6 +89,11 @@ export const routes: Routes = [
       {path:'tripdetails',component:Tripdetails},
       { path:'booking-confirmation',component:BookingConfirmationCard}
     ]
+  },
+  // Direct route for driver details (after successful login)
+  {
+    path: 'driver-details',
+    component: DriverDetails
   },
     { path: '', redirectTo: 'main', pathMatch: 'full' }
     

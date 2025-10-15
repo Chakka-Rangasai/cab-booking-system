@@ -3,64 +3,87 @@
     <h2 class="driver-title">Driver Registration</h2>
 
     <form class="driver-form" (ngSubmit)="onRegisterDriver()" #driverForm="ngForm">
+      <!-- Error Message Display -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      
       <div class="form-row">
         <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" [(ngModel)]="username" required />
+          <label for="fullName">Full Name *</label>
+          <input type="text" id="fullName" name="fullName" [(ngModel)]="fullName" required />
         </div>
 
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">Email *</label>
           <input type="email" id="email" name="email" [(ngModel)]="email" required email />
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" [(ngModel)]="password" required />
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" [(ngModel)]="password" required minlength="8" />
         </div>
 
         <div class="form-group">
-          <label for="mobile">Mobile</label>
-          <input type="tel" id="mobile" name="mobile" [(ngModel)]="mobile" required pattern="^[6-9][0-9]{9}$" />
+          <label for="confirmPassword">Confirm Password *</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required />
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="licenseId">Driver License ID</label>
-          <input type="text" id="licenseId" name="licenseId" [(ngModel)]="licenseId" required />
+          <label for="phoneNumber">Phone Number *</label>
+          <input type="tel" id="phoneNumber" name="phoneNumber" [(ngModel)]="phoneNumber" required pattern="^[6-9][0-9]{9}$" placeholder="10-digit mobile number" />
         </div>
 
         <div class="form-group">
-          <label for="vehicleNumber">Vehicle Number</label>
-          <input type="text" id="vehicleNumber" name="vehicleNumber" [(ngModel)]="vehicleNumber" required />
+          <label for="licenseNumber">License Number *</label>
+          <input type="text" id="licenseNumber" name="licenseNumber" [(ngModel)]="licenseNumber" required />
         </div>
       </div>
 
       <div class="form-row">
-        <div class="form-group full-width">
-          <label for="vehicleModel">Vehicle Model</label>
-          <input type="text" id="vehicleModel" name="vehicleModel" [(ngModel)]="vehicleModel" required />
+        <div class="form-group">
+          <label for="vehicleModel">Vehicle Model *</label>
+          <input type="text" id="vehicleModel" name="vehicleModel" [(ngModel)]="vehicleModel" required placeholder="e.g., Maruti Swift, Hyundai Creta" />
+        </div>
+
+        <div class="form-group">
+          <label for="vehicleRegNo">Vehicle Registration Number *</label>
+          <input type="text" id="vehicleRegNo" name="vehicleRegNo" [(ngModel)]="vehicleRegNo" required placeholder="e.g., MH01AB1234" />
         </div>
       </div>
 
       <div class="form-row">
-        <div class="form-group full-width">
-          <label for="vehicleDetails">Upload Vehicle Details (PDF)</label>
-          <input type="file" id="vehicleDetails" name="vehicleDetails" accept=".pdf" required (change)="onFileSelected($event)" />
+        <div class="form-group">
+          <label for="vehicleColor">Vehicle Color *</label>
+          <input type="text" id="vehicleColor" name="vehicleColor" [(ngModel)]="vehicleColor" required placeholder="e.g., White, Black, Red" />
+        </div>
+
+        <div class="form-group">
+          <label for="capacity">Vehicle Capacity *</label>
+          <select id="capacity" name="capacity" [(ngModel)]="capacity" required>
+            <option value="2">2 Seats</option>
+            <option value="4" selected>4 Seats</option>
+            <option value="6">6 Seats</option>
+            <option value="8">8 Seats</option>
+          </select>
         </div>
       </div>
 
-      <button type="submit" class="driver-btn" [disabled]="driverForm.invalid">Register</button>
+      <button type="submit" class="driver-btn" [disabled]="driverForm.invalid || isLoading">
+        <span *ngIf="isLoading">Registering...</span>
+        <span *ngIf="!isLoading">Register</span>
+      </button>
     </form>
 
     <!-- Login Button Section -->
     
 <div class="login-section">
   <p>Already have an account?</p>
-  <a routerLink="driverlogin" class="btn user-btn" (click)="onDriverLoginBtn()">Login</a>
+  <button type="button" class="btn user-btn" (click)="onDriverLoginBtn()">Login</button>
 </div>
 
 
