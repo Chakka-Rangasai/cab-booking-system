@@ -691,3 +691,11 @@
     text-align: center;
   }
 }
+
+/* Rating Styles */
+.rating-item { align-items: center; }
+.rating-wrapper { display:flex; align-items:center; gap:8px; }
+.stars { position:relative; font-size:1.1rem; line-height:1; display:inline-block; }
+.stars-bg { color:#dcdde1; }
+.stars-fill { color:#f1c40f; position:absolute; top:0; left:0; white-space:nowrap; overflow:hidden; }
+.rating-value { font-weight:600; color:#333; }

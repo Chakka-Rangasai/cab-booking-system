@@ -122,7 +122,7 @@ export class DriverService {
       vehicleColor: d.vehicleColor,
       capacity: d.capacity,
       isAvailable: d.isAvailable !== undefined ? d.isAvailable : true,
-      isVerified: d.isVerified !== undefined ? d.isVerified : false
+      isVerified: d.isVerified !== undefined ? d.isVerified : true
     };
   }
 
@@ -206,6 +206,35 @@ export class DriverService {
     return this.httpClient.post<{token: string, driver: DriverInfo}>(url, loginData, {
       observe: 'response'
     });
+  }
+
+  // Get driver average rating (public by default, pass true to use auth)
+  getDriverAverage(driverId: number, useAuth: boolean = false) {
+    const url = `${this.baseUrl}/reviews/driver/${driverId}/average`;
+    this.logApiRequest('GET', url);
+    if (useAuth) {
+      return this.httpClient.get<number>(url, { headers: this.getAuthHeaders() });
+    }
+    return this.httpClient.get<number>(url);
+  }
+
+  private getStoredDriver(): DriverInfo | null {
+    if (isPlatformBrowser(this.platformId)) {
+      const raw = localStorage.getItem('driverInfo');
+      if (raw) {
+        try { return JSON.parse(raw); } catch { return null; }
+      }
+    }
+    return null;
+  }
+
+  getCurrentDriverAverage() {
+    const stored = this.getStoredDriver();
+    if (!stored?.driverId) {
+      console.warn('getCurrentDriverAverage: No driverId in stored driver');
+      return this.httpClient.get<number>('about:blank'); // will error quickly if misused
+    }
+    return this.getDriverAverage(stored.driverId);
   }
 
 }

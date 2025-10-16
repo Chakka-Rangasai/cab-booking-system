@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID, OnInit } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -14,6 +14,7 @@ export class DriverDetails implements OnInit {
   constructor(
     private router: Router, 
     private driverService: DriverService,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
   // Real driver data from backend
@@ -21,6 +22,7 @@ export class DriverDetails implements OnInit {
   isEditing: boolean = false;
   editedDriver: DriverInfo | null = null;
   isLoading: boolean = false;
+  averageRating: number | null = null;
 
   // Ride request and history data with better mock data
   rideRequests = [
@@ -103,6 +105,7 @@ export class DriverDetails implements OnInit {
         this.driver = JSON.parse(storedDriver);
         if (this.driver) {
           this.ensureDriverFlags(this.driver);
+          this.fetchAverage();
           this.editedDriver = this.createDriverCopy(this.driver);
         }
       } else {
@@ -112,10 +115,33 @@ export class DriverDetails implements OnInit {
     }
   }
 
+  private fetchAverage() {
+    if (!this.driver?.driverId) {
+      console.warn('fetchAverage: missing driverId');
+      this.averageRating = null;
+      return;
+    }
+    console.log('fetchAverage -> calling /driver/' + this.driver.driverId + '/average (no auth)');
+    this.driverService.getDriverAverage(this.driver.driverId, false).subscribe({
+      next: (val: number) => {
+        this.averageRating = typeof val === 'number' ? val : Number(val);
+        console.log('fetchAverage success raw:', val, 'stored averageRating:', this.averageRating);
+        // Force change detection to update UI immediately
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('fetchAverage error status:', err?.status, 'body:', err?.error);
+        this.averageRating = null;
+      }
+    });
+  }
+
   // Ensure flags exist (no legacy Available/Verified handling now)
   private ensureDriverFlags(driver: any) {
+    console.log('ensureDriverFlags input:', driver);
     if (driver.isAvailable === undefined) driver.isAvailable = true;
-    if (driver.isVerified === undefined) driver.isVerified = false;
+    if (driver.isVerified === undefined) driver.isVerified = true;
+    console.log('ensureDriverFlags after normalization:', driver);
   }
 
   // Toggle availability with backend integration
@@ -124,17 +150,16 @@ export class DriverDetails implements OnInit {
     const newAvailability = !this.driver.isAvailable;
     this.isLoading = true;
     this.driverService.toggleAvailability(this.driver.driverId, newAvailability).subscribe({
-      next: (resp) => {
+      next: () => {
         this.driver!.isAvailable = newAvailability;
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('driverInfo', JSON.stringify(this.driver));
         }
+        this.fetchAverage();
         this.isLoading = false;
+        alert('Availability updated');
       },
-      error: (err) => {
-        this.isLoading = false;
-        alert('Failed to update availability');
-      }
+      error: () => { this.isLoading = false; alert('Failed to update availability'); }
     });
   }
 
@@ -157,10 +182,10 @@ export class DriverDetails implements OnInit {
     if (!this.editedDriver) return;
     this.isLoading = true;
     this.driverService.updateDriverProfile(this.editedDriver).subscribe({
-      next: (resp) => {
+      next: (resp: any) => {
         this.driver = resp.body!;
         this.ensureDriverFlags(this.driver);
-        this.editedDriver = this.createDriverCopy(this.driver);
+        this.editedDriver = this.createDriverCopy(this.driver!);
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('driverInfo', JSON.stringify(this.driver));
         }
@@ -274,7 +299,7 @@ export class DriverDetails implements OnInit {
       vehicleColor: driver.vehicleColor || '',
       capacity: driver.capacity,
       isAvailable: driver.isAvailable ?? true,
-      isVerified: driver.isVerified ?? false
+      isVerified: driver.isVerified ?? true
     };
   }
 

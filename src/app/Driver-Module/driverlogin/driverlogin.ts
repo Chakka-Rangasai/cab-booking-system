@@ -37,9 +37,11 @@ export class DriverLoginComponent implements OnInit {
 
   private normalizeDriver(driver: any) {
     if (!driver) return driver;
-    // Only ensure defaults; no legacy field names
+    console.log('normalizeDriver raw from backend:', driver);
+    // Map backend field names correctly
     if (driver.isAvailable === undefined) driver.isAvailable = true;
-    if (driver.isVerified === undefined) driver.isVerified = false;
+    if (driver.isVerified === undefined) driver.isVerified = true;
+    console.log('normalizeDriver after normalization:', driver);
     return driver;
   }
 
@@ -50,7 +52,6 @@ export class DriverLoginComponent implements OnInit {
     // Basic validation
     if (!this.email || !this.password) {
       this.errorMessage = 'Please enter both email and password.';
-      console.error('Validation failed: Missing email or password');
       return;
     }
 
@@ -58,7 +59,6 @@ export class DriverLoginComponent implements OnInit {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
       this.errorMessage = 'Please enter a valid email address.';
-      console.error('Validation failed: Invalid email format');
       return;
     }
 
@@ -71,7 +71,7 @@ export class DriverLoginComponent implements OnInit {
     };
 
     this.driverService.loginDriver(this.email, this.password).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         console.log('Login successful:', response);
         
         if (response && response.body && response.body.token) {

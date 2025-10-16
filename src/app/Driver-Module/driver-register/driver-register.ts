@@ -132,14 +132,14 @@ onRegisterDriver() {
 
   // Call backend API through DriverService
   this.driverService.registerDriver(driverData).subscribe({
-    next: (response) => {
+    next: (response: any) => {
       console.log('✅ Driver registration successful:', response.body);
       this.isLoading = false;
       alert('Driver registration successful! Please login to continue.');
       this.resetForm();
       this.router.navigate(['/main/driverlogin']);
     },
-    error: (error) => {
+    error: (error: any) => {
       console.error('❌ Driver registration failed:', error);
       this.isLoading = false;
       

@@ -71,11 +71,29 @@
         <h3>Account Status</h3>
         <div class="info-item">
           <label>Verified:</label>
-          <span [class]="driver.isVerified ? 'status-verified' : 'status-pending'">
-            {{ driver.isVerified ? 'Verified' : 'Pending' }}
+          <span [class]="driver.isVerified ? 'status-verified' :'status-pending' ">
+            {{ driver.isVerified ? 'Verified'  : 'Pending' }}
           </span>
+          
         </div>
-        
+        <ng-container *ngIf="averageRating !== null; else noRating">
+          <div class="info-item rating-item">
+            <label>Avg Rating:</label>
+            <div class="rating-wrapper" aria-label="Average rating">
+              <div class="stars">
+                <div class="stars-bg">★★★★★</div>
+                <div class="stars-fill" [style.width.%]="(averageRating/5)*100">★★★★★</div>
+              </div>
+              <span class="rating-value">{{ averageRating | number:'1.1-2' }}</span>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noRating>
+          <div class="info-item">
+            <label>Avg Rating:</label>
+            <span>N/A</span>
+          </div>
+        </ng-template>
       </div>
     </div>
 
