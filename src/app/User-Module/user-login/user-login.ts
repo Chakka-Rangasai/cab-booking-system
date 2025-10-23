@@ -14,25 +14,25 @@ import { UserService } from '../../user-service';
 })
 export class UserLogin {
 userLoginObj = {
-    userName: '',
-    userPassword: ''
+    email: '',
+    password: ''
   };
   errorMessage="";
  
   constructor(private router: Router,private userService:UserService) {}
  
   onLogin() {
-    if (!this.userLoginObj.userName && !this.userLoginObj.userPassword) {
+    if (!this.userLoginObj.email && !this.userLoginObj.password) {
       alert('Please enter username and password.');
       return;
     }
  
-    if (!this.userLoginObj.userName) {
+    if (!this.userLoginObj.email) {
       alert('Please enter username.');
       return;
     }
  
-    if (!this.userLoginObj.userPassword) {
+    if (!this.userLoginObj.password) {
       alert('Please enter password.');
       return;
     }
@@ -40,7 +40,7 @@ userLoginObj = {
    this.userService.loginValidation(this.userLoginObj).subscribe({
   next: (response) => {
       if(this.userService.getToken()){
-        alert('Login Successfull');
+        alert('Login Successful');
       this.router.navigate(['/userhomenav']); // Navigate on successful token
     } else {
       alert('Login failed: Token not received.');

@@ -1,63 +1,124 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { DriverService } from '../../driver.service';
 
 @Component({
   selector: 'app-driverlogin',
-  imports: [FormsModule,CommonModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './driverlogin.html',
-  styleUrl: './driverlogin.css'
+  styleUrls: ['./driverlogin.css']
 })
-export class Driverlogin {
-username: string = '';
+export class DriverLoginComponent implements OnInit {
+  email: string = '';
   password: string = '';
+  errorMessage: string = '';
+  loading: boolean = false;
+  showPassword: boolean = false;
+  isBrowser: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private driverService: DriverService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
+
+  ngOnInit() {
+    // Check if already logged in
+    if (this.isBrowser && localStorage.getItem('driverToken')) {
+      this.router.navigate(['/drivernav/']);
+    }
+  }
+
+  private normalizeDriver(driver: any) {
+    if (!driver) return driver;
+    console.log('normalizeDriver raw from backend:', driver);
+    // Map backend field names correctly
+    if (driver.isAvailable === undefined) driver.isAvailable = true;
+    if (driver.isVerified === undefined) driver.isVerified = true;
+    console.log('normalizeDriver after normalization:', driver);
+    return driver;
+  }
 
   onLogin() {
-    const correctUsername = 'ranga';
-    const correctPassword = '1234';
+    console.log('Login attempt started for email:', this.email);
+    this.errorMessage = '';
 
-    // Check if both fields are empty
-    if (!this.username && !this.password) {
-      alert('Please enter username and password.');
+    // Basic validation
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Please enter both email and password.';
       return;
     }
 
-    // Check if username is empty
-    if (!this.username) {
-      alert('Please enter username.');
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.errorMessage = 'Please enter a valid email address.';
       return;
     }
 
-    // Check if password is empty
-    if (!this.password) {
-      alert('Please enter password.');
-      return;
-    }
+    this.loading = true;
+    console.log('Calling backend API for login...');
 
-    // Check if both are incorrect
-    if (this.username !== correctUsername && this.password !== correctPassword) {
-      alert('Invalid username and password.');
-      return;
-    }
+    const loginData = {
+      email: this.email,
+      password: this.password
+    };
 
-    // Check if username is incorrect
-    if (this.username !== correctUsername) {
-      alert('Invalid username.');
-      return;
-    }
+    this.driverService.loginDriver(this.email, this.password).subscribe({
+      next: (response: any) => {
+        console.log('Login successful:', response);
+        
+        if (response && response.body && response.body.token) {
+          // Store the token
+          if (this.isBrowser) {
+            localStorage.setItem('driverToken', response.body.token);
+            if (response.body.driver) {
+              const normalized = this.normalizeDriver(response.body.driver);
+              localStorage.setItem('driverInfo', JSON.stringify(normalized));
+            }
+          }
+          
+          // Show success alert
+          alert('Login successful! Welcome to your dashboard.');
+          
+          // Navigate to driver details
+          this.router.navigate(['/driver-details']);
+        } else {
+          console.error('Login response missing token:', response);
+          this.errorMessage = 'Login failed. Invalid response from server.';
+          alert('Login failed. Invalid response from server.');
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Login error:', error);
+        this.loading = false;
+        
+        if (error.status === 401) {
+          this.errorMessage = 'Invalid email or password.';
+          alert('Login Failed: Invalid email or password. Please check your credentials.');
+        } else if (error.status === 0) {
+          this.errorMessage = 'Cannot connect to server. Please check if backend is running.';
+          alert('Connection Error: Cannot connect to server. Please check if backend is running on http://localhost:8080.');
+        } else if (error.error && error.error.message) {
+          this.errorMessage = error.error.message;
+          alert(`Login Failed: ${error.error.message}`);
+        } else {
+          this.errorMessage = 'Login failed. Please try again.';
+          alert('Login Failed: An unexpected error occurred. Please try again.');
+        }
+      }
+    });
+  }
 
-    // Check if password is incorrect
-    if (this.password !== correctPassword) {
-      alert('Invalid password.');
-      return;
-    }
-
-    // If everything is correct
-    alert('Login successful!');
-    this.router.navigate(['/drivernav/']);
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   onClickRegister() {

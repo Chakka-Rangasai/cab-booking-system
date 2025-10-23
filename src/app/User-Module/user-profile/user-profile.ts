@@ -19,6 +19,12 @@ export class UserProfile implements OnInit {
     userEmail: '',
     userPhoneNumber: ''
   };
+  newUserProfile = {
+    userId:0,
+    userName: '',
+    userEmail: '',
+    userPhoneNumber: ''
+  };
 
   isEditing = false;
 
@@ -41,27 +47,37 @@ export class UserProfile implements OnInit {
   }
 
 updateProfile(newName: string, newEmail: string, newPhone: string) {
-  this.userProfile.userName = newName;
-  this.userProfile.userEmail = newEmail;
-  this.userProfile.userPhoneNumber = newPhone;
+  this.newUserProfile.userId=this.userProfile.userId;
+  this.newUserProfile.userName = newName;
+  this.newUserProfile.userEmail = newEmail;
+  this.newUserProfile.userPhoneNumber = newPhone;
   this.isEditing = false;
 
   // Save to local storage
-  localStorage.setItem('userProfileDetails', JSON.stringify(this.userProfile));
+  //localStorage.setItem('userProfileDetails', JSON.stringify(this.userProfile));
 
   // Call the service and handle the response
-  this.userService.updateUserProfile(this.userProfile).subscribe({
-    next: (response) => {
-      if (response.body && response.body.message) {
-        alert(response.body.message); // Show success message
-      } else {
-        alert('Profile updated, but no message returned.');
-      }
-    },
-    error: (error) => {
-      console.error('Error updating profile:', error);
+  this.userService.updateUserProfile(this.newUserProfile).subscribe({
+  next: (response) => {
+    if (response.body && response.body.message) {
+      alert(response.body.message); // Show success message
+      // Save to local storage
+      localStorage.setItem('userProfileDetails', JSON.stringify(this.newUserProfile));
+    } else {
+      alert('Profile updated, but no message returned.');
+    }
+  },
+  error: (error) => {
+    console.error('Error updating profile:', error);
+
+    // Check if error is a field-specific map
+    if (error.error && typeof error.error === 'object') {
+      const errorMessages = Object.values(error.error).join('\n');
+      alert(errorMessages); // Show all error messages
+    } else {
       alert('Failed to update profile. Please try again later.');
     }
-  });
+  }
+});
 }
 }

@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { UserRegister } from './User-Module/user-register/user-register';
 import { DriverRegister } from './Driver-Module/driver-register/driver-register';
 import { UserLogin } from './User-Module/user-login/user-login';
-import { Driverlogin } from './Driver-Module/driverlogin/driverlogin';
+import { DriverLoginComponent } from './Driver-Module/driverlogin/driverlogin';
 import { Userhome } from './RideBooking-Module/userhome/userhome';
 import { UserResetPassword } from './User-Module/user-reset-password/user-reset-password';
 import { UserEnterOtp } from './User-Module/user-enter-otp/user-enter-otp';
@@ -24,6 +24,7 @@ import { DrivermainNav } from './Driver-Module/drivermain-nav/drivermain-nav';
 import { Tripdetails } from './RideBooking-Module/tripdetails/tripdetails';
 import { UserProfile } from './User-Module/user-profile/user-profile';
 import { AuthGuard } from './auth-guard';
+import { BookingWaiting } from './RideBooking-Module/booking-waiting/booking-waiting';
 // import { UserProfile } from './user-profile/user-profile';
 export const routes: Routes = [
     {
@@ -47,7 +48,7 @@ export const routes: Routes = [
         path:"userresetpassword",component: UserResetPassword
     },
     {
-        path:'driverlogin',component:Driverlogin
+        path:'driverlogin',component:DriverLoginComponent
     },
     {
         path:'driverresetpassword',component:DriverResetPassword
@@ -77,7 +78,7 @@ export const routes: Routes = [
     component: DrivermainNav,
     children: [
         {
-        path:"",component:DriverDetails     //default child route
+        path:"",component: DriverDetails     //default child route
     }
     ]
   },
@@ -91,6 +92,7 @@ export const routes: Routes = [
       { path: 'cnf-booking', component: Cnfbooking },
       {path:'tripdetails',component:Tripdetails},
       {path:'userprofile',component:UserProfile},
+      {path:'booking-waiting',component:BookingWaiting},
       { path:'booking-confirmation',component:BookingConfirmationCard}
     ]
   },

@@ -1,0 +1,28 @@
+<div class="allocation-container">
+  <h2>Ride Allocation Status</h2>
+
+  <!-- Waiting State -->
+  <div *ngIf="status == 'waiting'" class="status waiting">
+    <p>🚕 Waiting for a driver to accept your ride...</p>
+    <div class="loader"></div>
+  </div>
+
+  <!-- Confirmed State -->
+  <div *ngIf="status == 'confirmed'" class="status confirmed">
+    <h3>✅ Ride Confirmed!</h3>
+    <p><strong>Driver Name:</strong> {{ bookingDetails?.driver?.name }}</p>
+    <p><strong>Car Number:</strong> {{ bookingDetails?.driver?.carNumber }}</p>
+    <p><strong>Mobile Number:</strong> {{ bookingDetails?.driver?.phoneNumber }}</p>
+    <p><strong>From:</strong> {{ bookingDetails?.origin }}</p>
+    <p><strong>To:</strong> {{ bookingDetails?.destination }}</p>
+    <p><strong>Distance:</strong> {{ bookingDetails?.distance }}</p>
+    <p><strong>Amount:</strong> ₹{{ bookingDetails?.amount }}</p>
+  </div>
+
+  <!-- Cancelled State -->
+  <div *ngIf="status == 'cancelled'" class="status cancelled">
+    <h3>❌ Ride Cancelled</h3>
+    <p>No driver accepted your ride within 2 minutes.</p>
+    <button (click)="goHome()">Back to Home</button>
+  </div>
+</div>

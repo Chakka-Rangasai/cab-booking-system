@@ -98,6 +98,19 @@ input:focus {
   background-color: #145dbf;
 }
 
+/* Error message styling */
+.error-message {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 500;
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
   .form-row {

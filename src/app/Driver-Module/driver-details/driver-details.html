@@ -1,58 +1,309 @@
-<div class="dashboard">
-  <h2>Welcome, {{ driver.name }}</h2>
- 
-  <!-- Driver Profile -->
-  <section class="profile">
-    <h3>Profile Details</h3>
-    <p><strong>Mobile No:</strong> {{ driver.mobile }}</p>
-    <p><strong>Vehicle ID:</strong> {{ driver.vehicleId }}</p>
-    <p><strong>License ID:</strong> {{ driver.licenseId }}</p>
-    <img [src]="driver.licensePic" alt="License Photo" />
-    <p><strong>Aadhaar ID:</strong> {{ driver.aadhaarId }}</p>
-    <img [src]="driver.aadhaarPic" alt="Aadhaar Photo" />
-  </section>
- 
-  <!-- Availability Toggle -->
-  <section class="availability">
-  <label>
-    <input type="checkbox" [(ngModel)]="driver.isAvailable" />
-    {{ driver.isAvailable ? 'Available for Rides' : 'Not Available' }}
-  </label>
-</section>
- 
-<!-- Incoming Ride Requests -->
-@if (driver.isAvailable && rideRequests.length > 0) {
-  <section class="ride-requests">
-    <h3>Incoming Ride Requests</h3>
-    @for (ride of rideRequests; track $index) {
-      <div class="ride-card">
-        <p><strong>Pickup:</strong> {{ ride.pickup }}</p>
-        <p><strong>Drop:</strong> {{ ride.drop }}</p>
-        <p><strong>Cost:</strong> {{ ride.fare }}</p>
-        <button (click)="acceptRide(ride)">Accept</button>
-        <button (click)="rejectRide(ride)">Reject</button>
+<div class="dashboard" *ngIf="driver">
+  <!-- Header Section -->
+  <div class="header">
+    <h1>Driver Dashboard</h1>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <!-- Driver Profile Display Mode -->
+  <div *ngIf="!isEditing" class="profile-view">
+    <div class="welcome-section">
+      <h2>Welcome, {{ driver.fullName }}!</h2>
+      
+      <!-- Availability Toggle Section -->
+      <div class="availability-section">
+        <span class="status-label">Status:</span>
+        <span [class]="driver.isAvailable ? 'status-available' : 'status-unavailable'">
+          {{ driver.isAvailable ? 'Available' : 'Unavailable' }}
+        </span>
+        <button 
+          class="toggle-btn" 
+          [disabled]="isLoading"
+          (click)="toggleAvailability()">
+          {{ isLoading ? 'Updating...' : (driver.isAvailable ? 'Go Offline' : 'Go Online') }}
+        </button>
       </div>
-    }
-  </section>
-}
+    </div>
+
+    <!-- Driver Profile Details -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Personal Information</h3>
+        <div class="info-item">
+          <label>Full Name:</label>
+          <span>{{ driver.fullName }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ driver.email }}</span>
+        </div>
+        <div class="info-item">
+          <label>Phone:</label>
+          <span>{{ driver.phoneNumber }}</span>
+        </div>
+        <div class="info-item">
+          <label>License Number:</label>
+          <span>{{ driver.licenseNumber }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>Vehicle Information</h3>
+        <div class="info-item">
+          <label>Model:</label>
+          <span>{{ driver.vehicleModel }}</span>
+        </div>
+        <div class="info-item">
+          <label>Registration:</label>
+          <span>{{ driver.vehicleRegNo }}</span>
+        </div>
+        <div class="info-item">
+          <label>Color:</label>
+          <span>{{ driver.vehicleColor }}</span>
+        </div>
+        <div class="info-item">
+          <label>Capacity:</label>
+          <span>{{ driver.capacity }} seats</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>Account Status</h3>
+        <div class="info-item">
+          <label>Verified:</label>
+          <span [class]="driver.isVerified ? 'status-verified' :'status-pending' ">
+            {{ driver.isVerified ? 'Verified'  : 'Pending' }}
+          </span>
+          
+        </div>
+        <ng-container *ngIf="averageRating !== null; else noRating">
+          <div class="info-item rating-item">
+            <label>Avg Rating:</label>
+            <div class="rating-wrapper" aria-label="Average rating">
+              <div class="stars">
+                <div class="stars-bg">★★★★★</div>
+                <div class="stars-fill" [style.width.%]="(averageRating/5)*100">★★★★★</div>
+              </div>
+              <span class="rating-value">{{ averageRating | number:'1.1-2' }}</span>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noRating>
+          <div class="info-item">
+            <label>Avg Rating:</label>
+            <span>N/A</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <button class="edit-btn" (click)="startEdit()">Edit Profile</button>
+  </div>
+
+  <!-- Profile Edit Mode -->
+  <div *ngIf="isEditing" class="profile-edit">
+    <h2>Edit Profile</h2>
+    
+    <form class="edit-form" *ngIf="editedDriver">
+      <div class="form-section">
+        <h3>Personal Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fullName">Full Name *</label>
+            <input 
+              type="text" 
+              id="fullName" 
+              [(ngModel)]="editedDriver.fullName" 
+              name="fullName"
+              required 
+              placeholder="Enter full name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              type="email" 
+              id="email" 
+              [(ngModel)]="editedDriver.email" 
+              name="email"
+              required 
+              placeholder="Enter email address">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number *</label>
+            <input 
+              type="tel" 
+              id="phoneNumber" 
+              [(ngModel)]="editedDriver.phoneNumber" 
+              name="phoneNumber"
+              required 
+              placeholder="Enter phone number">
+          </div>
+          <!-- <div class="form-group">
+            <label for="licenseNumber">License Number *</label>
+            <input 
+              type="text" 
+              id="licenseNumber" 
+              [(ngModel)]="editedDriver.licenseNumber" 
+              name="licenseNumber"
+              required 
+              placeholder="Enter license number">
+          </div> -->
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Vehicle Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vehicleModel">Vehicle Model *</label>
+            <input 
+              type="text" 
+              id="vehicleModel" 
+              [(ngModel)]="editedDriver.vehicleModel" 
+              name="vehicleModel"
+              required 
+              placeholder="Enter vehicle model">
+          </div>
+          <div class="form-group">
+            <label for="vehicleRegNo">Registration Number *</label>
+            <input 
+              type="text" 
+              id="vehicleRegNo" 
+              [(ngModel)]="editedDriver.vehicleRegNo" 
+              name="vehicleRegNo"
+              required 
+              placeholder="Enter registration number">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vehicleColor">Vehicle Color *</label>
+            <input 
+              type="text" 
+              id="vehicleColor" 
+              [(ngModel)]="editedDriver.vehicleColor" 
+              name="vehicleColor"
+              required 
+              placeholder="Enter vehicle color">
+          </div>
+          <div class="form-group">
+            <label for="capacity">Seating Capacity *</label>
+            <input 
+              type="number" 
+              id="capacity" 
+              [(ngModel)]="editedDriver.capacity" 
+              name="capacity"
+              required 
+              min="1" 
+              max="20"
+              placeholder="Enter seating capacity">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="save-btn" [disabled]="isLoading" (click)="saveProfile()">
+          {{ isLoading ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button type="button" class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+  </div>
  
- 
- 
-  <!-- Ride History -->
-  <section class="ride-history">
-    <h3>Previous Rides</h3>
-    <ul>
-      @for (history of rideHistory ; track $index) {
-        <li>
-          {{ history.date }} - {{ history.pickup }} to {{ history.drop }} (₹{{ history.fare }})
-        </li>
-      }
-    </ul>
-  </section>
- 
-    <!-- Logout Button at the Bottom -->
- <button class="logout-btn" (click)="logout()">Logout</button>
- 
- 
+  <!-- Incoming Ride Requests (only show when available and not editing) -->
+  <!-- <div *ngIf="!isEditing && driver.isAvailable && rideRequests.length > 0" class="ride-requests">
+    <h3>Incoming Ride Requests</h3>
+    <div class="requests-container">
+      <div *ngFor="let ride of rideRequests; trackBy: trackByIndex" class="ride-card">
+        <div class="ride-info">
+          <div class="ride-detail">
+            <strong>Pickup:</strong> {{ ride.pickup }}
+          </div>
+          <div class="ride-detail">
+            <strong>Drop:</strong> {{ ride.drop }}
+          </div>
+          <div class="ride-detail fare">
+            <strong>Fare:</strong> ₹{{ ride.fare }}
+          </div>
+        </div>
+        <div class="ride-actions">
+          <button class="accept-btn" (click)="acceptRide(ride)">Accept</button>
+          <button class="reject-btn" (click)="rejectRide(ride)">Reject</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <div *ngIf="!isEditing && driver?.isAvailable && pendingRides.length > 0" class="ride-requests">
+  <h3>Incoming Ride Requests</h3>
+  <div class="requests-container">
+    <div *ngFor="let ride of pendingRides; trackBy: trackByIndex" class="ride-card">
+      <div class="ride-info">
+        <div class="ride-detail">
+          <strong>Pickup:</strong> {{ ride.origin }}
+        </div>
+        <div class="ride-detail">
+          <strong>Drop:</strong> {{ ride.destination }}
+        </div>
+        <div class="ride-detail fare">
+          <strong>Fare:</strong> ₹{{ ride.amount }}
+        </div>
+        <div class="ride-detail">
+          <strong>Distance:</strong> {{ ride.distance }}
+        </div>
+        <div class="ride-detail">
+          <strong>User ID:</strong> {{ ride.userId }}
+        </div>
+      </div>
+      <div class="ride-actions">
+        <button class="accept-btn" (click)="acceptRide(ride)">Accept</button>
+        <button class="reject-btn" (click)="rejectRide(ride)">Reject</button>
+      </div>
+    </div>
+  </div>
 </div>
- 
+
+
+  <!-- Ride History (only show when not editing) -->
+  <!-- <div *ngIf="!isEditing" class="ride-history">
+    <h3>Previous Rides</h3>
+    <div class="history-container">
+      <div *ngFor="let history of rideHistory; trackBy: trackByIndex" class="history-item">
+        <span class="history-date">{{ history.date }}</span>
+        <span class="history-route">{{ history.pickup }} → {{ history.drop }}</span>
+        <span class="history-fare">₹{{ history.fare }}</span>
+      </div>
+      <div *ngIf="rideHistory.length === 0" class="no-history">
+        No ride history available
+      </div>
+    </div>
+  </div>
+</div> -->
+<!-- Ride History (only show when not editing) -->
+<div *ngIf="!isEditing" class="ride-history">
+  <h3>Previous Rides</h3>
+  <div class="history-container">
+    <div *ngFor="let history of rideHistory; trackBy: trackByIndex" class="history-item">
+      <div class="history-detail">
+        <span class="history-date"><strong>Date:</strong> {{ history.date }}</span>
+        <span class="history-route"><strong>Route:</strong> {{ history.pickup }} → {{ history.drop }}</span>
+        <span class="history-fare"><strong>Fare:</strong> ₹{{ history.fare }}</span>
+        <span class="history-distance"><strong>Distance:</strong> {{ history.duration }}</span>
+        <span class="history-rating"><strong>Rating:</strong> {{ history.customerRating }}</span>
+      </div>
+    </div>
+    <div *ngIf="rideHistory.length === 0" class="no-history">
+      No ride history available
+    </div>
+  </div>
+</div>
+
+
+<!-- Loading overlay -->
+<div *ngIf="!driver" class="loading-container">
+  <div class="loading-spinner"></div>
+  <p>Loading driver information...</p>
+</div>
