@@ -18,10 +18,17 @@ export class UserBooking {
 
   constructor(private http: HttpClient) {}
 
-  bookRide(data: BookingData): Observable<any> {
-    console.log('Sending booking data to backend:', data);
-    return this.http.post<any>(this.apiUrl, data);
-  }
+ bookRide(data: BookingData): Observable<any> {
+  const token = localStorage.getItem('jwtToken'); // Or wherever you're storing the JWT
+  const headers = {
+    'Authorization': `Bearer ${token}`
+  };
+
+  console.log('Sending booking data to backend:', data);
+  return this.http.post<any>(this.apiUrl, data, { headers });
+}
+
+
 
   
 }
