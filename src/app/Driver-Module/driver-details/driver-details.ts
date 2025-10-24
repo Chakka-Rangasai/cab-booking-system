@@ -101,8 +101,11 @@ export class DriverDetails implements OnInit {
 
   ngOnInit() {
     this.loadDriverInfo();
-    this.loadPendingRides();
-    this.loadConfirmedRides();
+    // Only load rides if in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadPendingRides();
+      this.loadConfirmedRides();
+    }
   }
 
   
@@ -125,7 +128,12 @@ export class DriverDetails implements OnInit {
     }
   }
 
-    loadPendingRides() {
+  loadPendingRides() {
+    // Only make HTTP requests in browser environment
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
     this.driverService.getPendingRides().subscribe({
       next: (rides) => {
         this.pendingRides = rides;
@@ -142,7 +150,11 @@ export class DriverDetails implements OnInit {
   }
 
   loadConfirmedRides() {
-  if (this.driver && this.driver.driverId) {
+    // Only make HTTP requests in browser environment
+    if (!isPlatformBrowser(this.platformId) || !this.driver?.driverId) {
+      return;
+    }
+    
     this.driverService.getConfirmedRidesByDriver(this.driver.driverId).subscribe({
       next: (rides) => {
         this.rideHistory = rides.map(ride => ({
@@ -161,7 +173,6 @@ export class DriverDetails implements OnInit {
       }
     });
   }
-}
 
   private fetchAverage() {
     if (!this.driver?.driverId) {

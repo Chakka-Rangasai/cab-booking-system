@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RidePollingService } from '../../ride-polling-service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,32 +24,50 @@ export class BookingWaiting implements OnInit, OnDestroy {
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private ridePollingService: RidePollingService
+    private ridePollingService: RidePollingService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    // Only run polling and localStorage access in the browser
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.route.queryParamMap.subscribe(params => {
       this.bookingId = Number(params.get('id'));
 
-      const userId = (JSON.parse(localStorage.getItem("userProfileDetails")!) as { userId: number }).userId // Replace with actual user ID logic
-      const requestId = this.bookingId;
+      try {
+        const userProfile = localStorage.getItem("userProfileDetails");
+        if (!userProfile) {
+          console.error('No user profile found in localStorage');
+          this.router.navigate(['/main/userlogin']);
+          return;
+        }
 
-      // Start polling
-      this.ridePollingService.pollConfirmedRide(userId, requestId);
+        const userId = (JSON.parse(userProfile) as { userId: number }).userId;
+        const requestId = this.bookingId;
 
-      // Subscribe to booking updates
-      this.ridePollingService.bookingDetails$
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(details => {
-          if (details) {
-            this.ngZone.run(() => {
-              this.bookingDetails = details;
-              this.status = 'confirmed';
-              console.log('Booking confirmed:', this.bookingDetails);
-              this.cdr.markForCheck();
-            });
-          }
-        });
+        // Start polling
+        this.ridePollingService.pollConfirmedRide(userId, requestId);
+
+        // Subscribe to booking updates
+        this.ridePollingService.bookingDetails$
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(details => {
+            if (details) {
+              this.ngZone.run(() => {
+                this.bookingDetails = details;
+                this.status = 'confirmed';
+                console.log('Booking confirmed:', this.bookingDetails);
+                this.cdr.markForCheck();
+              });
+            }
+          });
+      } catch (error) {
+        console.error('Error parsing user profile from localStorage:', error);
+        this.router.navigate(['/main/userlogin']);
+      }
     });
   }
 

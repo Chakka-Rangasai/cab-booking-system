@@ -1,28 +1,148 @@
-<div class="allocation-container">
-  <h2>Ride Allocation Status</h2>
+<div class="page-wrapper">
+  <div class="allocation-container">
+    <!-- Header Section -->
+    <div class="header-section">
+      <h2>Ride Allocation Status</h2>
+    </div>
 
-  <!-- Waiting State -->
-  <div *ngIf="status == 'waiting'" class="status waiting">
-    <p>🚕 Waiting for a driver to accept your ride...</p>
-    <div class="loader"></div>
-  </div>
+    <!-- Waiting State -->
+    <div *ngIf="status == 'waiting'" class="status waiting">
+      <div class="waiting-content">
+        <div class="waiting-icon">
+          <div class="car-animation">
+            <div class="car"></div>
+            <div class="road"></div>
+          </div>
+        </div>
+        <h3>Looking for your driver...</h3>
+        <p>We're connecting you with the available driver</p>
+        <div class="loader-container">
+          <div class="loader"></div>
+          <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <p class="eta">This usually takes 5-10 minutes</p>
+      </div>
+    </div>
 
-  <!-- Confirmed State -->
-  <div *ngIf="status == 'confirmed'" class="status confirmed">
-    <h3>✅ Ride Confirmed!</h3>
-    <p><strong>Driver Name:</strong> {{ bookingDetails?.driver?.name }}</p>
-    <p><strong>Car Number:</strong> {{ bookingDetails?.driver?.carNumber }}</p>
-    <p><strong>Mobile Number:</strong> {{ bookingDetails?.driver?.phoneNumber }}</p>
-    <p><strong>From:</strong> {{ bookingDetails?.origin }}</p>
-    <p><strong>To:</strong> {{ bookingDetails?.destination }}</p>
-    <p><strong>Distance:</strong> {{ bookingDetails?.distance }}</p>
-    <p><strong>Amount:</strong> ₹{{ bookingDetails?.amount }}</p>
-  </div>
+    <!-- Confirmed State -->
+    <div *ngIf="status == 'confirmed'" class="status confirmed">
+      <div class="confirmed-content">
+        <div class="confirmed-header">
+          <div class="success-icon">
+            <div class="checkmark">✅</div>
+          </div>
+          <h3>Ride Confirmed!</h3>
+        </div>
+        <p class="success-message">Your driver is on the way</p>
+        
+        <div class="driver-card">
+          <div class="driver-header">
+            <div class="driver-avatar">👨‍💼</div>
+            <div class="driver-info">
+              <div class="driver-name-section">
+                <span class="driver-label">Driver Name :</span>
+                <h4>{{ bookingDetails?.driver?.name }}</h4>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="driver-divider">
+          
+          <div class="driver-details">
+            <div class="driver-details-row">
+              <div class="detail-item">
+                <span class="detail-icon">🚗</span>
+                <div class="detail-content">
+                  <span class="detail-label">Car Number</span>
+                  <span class="detail-value">{{ bookingDetails?.driver?.carNumber }}</span>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-icon">📞</span>
+                <div class="detail-content">
+                  <span class="detail-label">Mobile Number</span>
+                  <span class="detail-value">{{ bookingDetails?.driver?.phoneNumber }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  <!-- Cancelled State -->
-  <div *ngIf="status == 'cancelled'" class="status cancelled">
-    <h3>❌ Ride Cancelled</h3>
-    <p>No driver accepted your ride within 2 minutes.</p>
-    <button (click)="goHome()">Back to Home</button>
+        <div class="trip-details">
+          <h4>Trip Details</h4>
+          <div class="trip-route">
+            <div class="route-row">
+              <div class="route-item">
+                <span class="route-icon pickup"></span>
+                <div class="route-content">
+                  <span class="route-label">Pickup</span>
+                  <span class="route-value">{{ bookingDetails?.origin }}</span>
+                </div>
+              </div>
+              
+              <div class="route-arrow">→</div>
+              
+              <div class="route-item">
+                <span class="route-icon destination"></span>
+                <div class="route-content">
+                  <span class="route-label">Destination</span>
+                  <span class="route-value">{{ bookingDetails?.destination }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="trip-divider">
+          
+          <div class="trip-info">
+            <div class="trip-info-row">
+              <div class="info-item">
+                <span class="info-icon distance"></span>
+                <div class="info-content">
+                  <span class="info-label">Distance</span>
+                  <span class="info-value">{{ bookingDetails?.distance }}</span>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-icon amount"></span>
+                <div class="info-content">
+                  <span class="info-label">Amount</span>
+                  <span class="info-value amount">₹{{ bookingDetails?.amount }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancelled State -->
+    <div *ngIf="status == 'cancelled'" class="status cancelled">
+      <div class="cancelled-content">
+        <div class="error-icon">
+          <div class="cross">❌</div>
+        </div>
+        <h3>Ride Cancelled</h3>
+        <p>No driver accepted your ride within 2 minutes.</p>
+        <div class="suggestions">
+          <p>You can try:</p>
+          <ul>
+            <li>Booking again in a few minutes</li>
+            <li>Checking for nearby drivers</li>
+            <li>Contacting customer support</li>
+          </ul>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-secondary">Try Again</button>
+          <button class="btn-primary" (click)="goHome()">Back to Home</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

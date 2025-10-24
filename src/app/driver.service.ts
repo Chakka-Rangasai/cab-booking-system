@@ -25,7 +25,7 @@ export class DriverService {
   private baseUrl = 'http://localhost:8087/driver';
 
   constructor(private httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
-    console.log('🔧 DriverService initialized with baseUrl:', this.baseUrl);
+    console.log('DriverService initialized with baseUrl:', this.baseUrl);
   }
 
   // Get JWT token from localStorage with logging
@@ -36,10 +36,10 @@ export class DriverService {
       const authToken = localStorage.getItem('authToken');
       const token = driverToken || authToken;
       
-      console.log('🔐 JWT Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
+      console.log(' JWT Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
       return token;
     }
-    console.log('🖥️ Running on server side - no localStorage access');
+    console.log('Running on server side - no localStorage access');
     return null;
   }
 
@@ -50,9 +50,9 @@ export class DriverService {
     
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
-      console.log('🚀 Authorization header added:', `Bearer ${token.substring(0, 20)}...`);
+      console.log(' Authorization header added:', `Bearer ${token.substring(0, 20)}...`);
     } else {
-      console.log('❌ No token available - proceeding without Authorization header');
+      console.log(' No token available - proceeding without Authorization header');
     }
     
     return headers;
@@ -60,7 +60,7 @@ export class DriverService {
 
   // Log API request details
   private logApiRequest(method: string, url: string, data?: any) {
-    console.log(`📤 API ${method} Request:`, {
+    console.log(` API ${method} Request:`, {
       url: url,
       timestamp: new Date().toISOString(),
       data: data ? 'Data provided' : 'No data',
@@ -71,7 +71,7 @@ export class DriverService {
   // Log API response details
   private logApiResponse(method: string, url: string, response: any, error?: any) {
     if (error) {
-      console.error(`📥 API ${method} Error Response:`, {
+      console.error(` API ${method} Error Response:`, {
         url: url,
         timestamp: new Date().toISOString(),
         status: error.status,
@@ -80,7 +80,7 @@ export class DriverService {
         message: error.message
       });
     } else {
-      console.log(`📥 API ${method} Success Response:`, {
+      console.log(` API ${method} Success Response:`, {
         url: url,
         timestamp: new Date().toISOString(),
         status: response.status,
@@ -171,7 +171,7 @@ export class DriverService {
     const headers = this.getAuthHeaders();
     
     this.logApiRequest('PATCH', url);
-    console.log('🔧 PATCH Request Details:', {
+    console.log(' PATCH Request Details:', {
       url: url,
       method: 'PATCH',
       headers: {
@@ -194,7 +194,7 @@ export class DriverService {
     const url = `${this.baseUrl}/auth/login`;
     const loginData = { email, password };
     
-    console.log('🔐 Login Request:', {
+    console.log(' Login Request:', {
       url: url,
       email: email,
       timestamp: new Date().toISOString(),
