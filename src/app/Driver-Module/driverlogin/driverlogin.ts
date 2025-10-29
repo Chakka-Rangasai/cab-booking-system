@@ -31,7 +31,8 @@ export class DriverLoginComponent implements OnInit {
   ngOnInit() {
     // Check if already logged in
     if (this.isBrowser && localStorage.getItem('driverToken')) {
-      this.router.navigate(['/drivernav/']);
+      console.log('Driver already logged in, redirecting to dashboard');
+      this.router.navigate(['/drivernav']);
     }
   }
 
@@ -87,8 +88,14 @@ export class DriverLoginComponent implements OnInit {
           // Show success alert
           alert('Login successful! Welcome to your dashboard.');
           
-          // Navigate to driver details
-          this.router.navigate(['/driver-details']);
+          console.log('Navigating to driver dashboard...');
+          // Navigate to driver dashboard
+          this.router.navigate(['/drivernav']).then(success => {
+            console.log('Navigation result:', success);
+            if (!success) {
+              console.error('Navigation failed!');
+            }
+          });
         } else {
           console.error('Login response missing token:', response);
           this.errorMessage = 'Login failed. Invalid response from server.';

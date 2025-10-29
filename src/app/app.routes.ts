@@ -76,6 +76,7 @@ export const routes: Routes = [
 {
     path: 'drivernav',
     component: DrivermainNav,
+    canActivate: [AuthGuard],
     children: [
         {
         path:"",component: DriverDetails     //default child route

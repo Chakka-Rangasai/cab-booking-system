@@ -26,10 +26,15 @@ export class AuthGuard implements CanActivate {
     return of(null).pipe(
       delay(1),
       map(() => {
-        const token = localStorage.getItem('jwtToken');
-        console.log('AuthGuard: Token check result:', !!token);
+        const userToken = localStorage.getItem('jwtToken');
+        const driverToken = localStorage.getItem('driverToken');
+        const hasToken = !!(userToken || driverToken);
         
-        if (token) {
+        console.log('AuthGuard: User token:', !!userToken);
+        console.log('AuthGuard: Driver token:', !!driverToken);
+        console.log('AuthGuard: Has any token:', hasToken);
+        
+        if (hasToken) {
           console.log('AuthGuard: Access granted');
           return true;
         } else {

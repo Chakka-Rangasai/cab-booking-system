@@ -228,6 +228,10 @@ export class DriverService {
     return null;
   }
 
+
+
+
+  
   getCurrentDriverAverage() {
     const stored = this.getStoredDriver();
     if (!stored?.driverId) {
@@ -241,19 +245,47 @@ export class DriverService {
     return this.httpClient.get<any[]>("http://localhost:8087/driver/pending");
   }
 
-  acceptRideRequest(rideId: number, userId: number) {
-    const url = `http://localhost:8087/driver/acceptride/${rideId}/${userId}`;
-    return this.httpClient.get(url); // No body needed for this PATCH
+  acceptRideRequest(rideId: number, driverId: number) {
+    const url = `http://localhost:8087/driver/acceptride/${rideId}/${driverId}`;
+
+    const drivetoken =localStorage.getItem('driverToken')
+    console.log("this is the driver token "+drivetoken);
+  const headers = new HttpHeaders({
+      'Authorization': `Bearer ${drivetoken}`
+    });
+
+    return this.httpClient.post(url, {},{headers}); 
   }
 
-  getConfirmedRidesByDriver(driverId: number): Observable<any[]> {
-  const url = `${this.baseUrl}/${driverId}/confirmed`;
+  getCompletedRidesByDriver(driverId: number): Observable<any[]> {
+  const url = `${this.baseUrl}/${driverId}/completed`;
   const headers = new HttpHeaders({
     'Content-Type': 'application/json',
     Authorization: `Bearer ${this.getAuthToken() || ''}`
   });
   return this.httpClient.get<any[]>(url, { headers });
 }
+
+// normal implementation
+
+  getOngoingRidesByDriver(driverId: number): Observable<any[]> {
+    // const url = `http://localhost:8089/ride/${driverId}/ongoing`;
+    const url = `${this.baseUrl}/${driverId}/ongoing`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.getAuthToken() || ''}`
+    });
+    return this.httpClient.get<any[]>(url, { headers });
+  }
+
+  completeRide(rideId: number, driverId: number): Observable<any> {
+    const url = `${this.baseUrl}/completeride/${rideId}/${driverId}`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.getAuthToken() || ''}`
+    });
+    return this.httpClient.post(url, {}, { headers });
+  }
 
 
 

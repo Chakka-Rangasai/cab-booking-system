@@ -14,7 +14,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class BookingWaiting implements OnInit, OnDestroy {
   bookingId!: number;
-  status: 'waiting' | 'confirmed' | 'cancelled' = 'waiting';
+  status: 'waiting' | 'confirmed' | 'completed' | 'cancelled' = 'waiting';
   bookingDetails: any = null;
 
   private destroy$ = new Subject<void>();
@@ -33,6 +33,11 @@ export class BookingWaiting implements OnInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
+
+    // Clear any existing data before starting fresh
+    this.ridePollingService.clearData();
+    this.status = 'waiting';
+    this.bookingDetails = null;
 
     this.route.queryParamMap.subscribe(params => {
       this.bookingId = Number(params.get('id'));
@@ -58,8 +63,23 @@ export class BookingWaiting implements OnInit, OnDestroy {
             if (details) {
               this.ngZone.run(() => {
                 this.bookingDetails = details;
-                this.status = 'confirmed';
-                console.log('Booking confirmed:', this.bookingDetails);
+                
+                // Enhanced status checking with logging
+                console.log('Received booking update:', details);
+                console.log('Current status:', details.status);
+                
+                // Check ride status and update accordingly
+                if (details.status === 'COMPLETED') {
+                  this.status = 'completed';
+                  console.log('✅ Ride completed - UI updated to completed state');
+                } else if (details.status === 'ONGOING') {
+                  this.status = 'confirmed';
+                  console.log('🚗 Ride ongoing - UI updated to confirmed state');
+                } else {
+                  this.status = 'confirmed'; // Default to confirmed for any accepted ride
+                  console.log('📋 Booking confirmed - UI updated to confirmed state');
+                }
+                
                 this.cdr.markForCheck();
               });
             }
@@ -72,12 +92,32 @@ export class BookingWaiting implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Clear component state
+    this.status = 'waiting';
+    this.bookingDetails = null;
+    
+    // Stop observables
     this.destroy$.next();
     this.destroy$.complete();
-    this.ridePollingService.stopPolling();
+    
+    // Stop polling and clear cached data
+    this.ridePollingService.clearData();
+    
+    console.log('BookingWaiting component destroyed and data cleared.');
   }
 
   goHome(): void {
+    this.router.navigate(['/userhomenav']);
+  }
+
+  rateDriver(rating: number): void {
+    // TODO: Implement driver rating functionality
+    console.log(`User rated driver: ${rating} stars`);
+    // After rating, you can send the rating to backend
+    alert(`Thank you for rating ${rating} stars!`);
+  }
+
+  bookAnotherRide(): void {
     this.router.navigate(['/userhomenav']);
   }
 }

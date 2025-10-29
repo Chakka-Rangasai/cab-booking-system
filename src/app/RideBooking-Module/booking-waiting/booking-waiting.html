@@ -122,8 +122,59 @@
       </div>
     </div>
 
+    <!-- Completed State -->
+    <div *ngIf="status == 'completed'" class="status completed">
+      <div class="completed-content">
+        <div class="completed-header">
+        
+          <h3>🎉Ride Completed!</h3>
+        </div>
+        <p class="success-message">Thank you for riding with us</p>
+        
+        <div class="trip-summary">
+          <h4>Trip Summary</h4>
+          <div class="summary-details">
+            <div class="summary-item">
+              <span class="summary-label">From:</span>
+              <span class="summary-value">{{ bookingDetails?.origin }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">To:</span>
+              <span class="summary-value">{{ bookingDetails?.destination }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Distance:</span>
+              <span class="summary-value">{{ bookingDetails?.distance }}</span>
+            </div>
+            <hr class="trip-divider">
+            <div class="summary-item total-amount">
+              <span class="summary-label">Total Amount:</span>
+              <span class="summary-value amount">₹{{ bookingDetails?.amount }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="driver-rating">
+          <h4>Rate Your Driver</h4>
+          <p>How was your experience with {{ bookingDetails?.driver?.name }}?</p>
+          <div class="rating-stars">
+            <span *ngFor="let star of [1,2,3,4,5]" 
+                  class="star" 
+                  (click)="rateDriver(star)">
+              ⭐
+            </span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-primary" (click)="bookAnotherRide()">Book Another Ride</button>
+          <button class="btn-secondary" (click)="goHome()">Go to Home</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Cancelled State -->
-    <div *ngIf="status == 'cancelled'" class="status cancelled">
+    <!-- <div *ngIf="status == 'cancelled'" class="status cancelled">
       <div class="cancelled-content">
         <div class="error-icon">
           <div class="cross">❌</div>
@@ -145,4 +196,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
