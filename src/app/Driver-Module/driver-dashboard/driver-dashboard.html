@@ -1,0 +1,229 @@
+<div class="dashboard-container">
+  <div class="header">
+    <h1>Driver Dashboard</h1>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <div *ngIf="driver" class="driver-profile">
+    <!-- Driver Info Display Mode -->
+    <div *ngIf="!isEditing" class="profile-view">
+      <div class="profile-header">
+        <h2>Welcome, {{ driver.fullName }}!</h2>
+        <div class="availability-section">
+          <span class="status-label">Status:</span>
+          <span [class]="driver.isAvailable ? 'status-available' : 'status-unavailable'">
+            {{ driver.isAvailable ? 'Available' : 'Unavailable' }}
+          </span>
+          <button 
+            class="toggle-btn" 
+            [disabled]="isLoading"
+            (click)="toggleAvailability()">
+            {{ driver.isAvailable ? 'Go Offline' : 'Go Online' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>Personal Information</h3>
+          <div class="info-item">
+            <label>Full Name:</label>
+            <span>{{ driver.fullName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ driver.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Phone:</label>
+            <span>{{ driver.phoneNumber }}</span>
+          </div>
+          <div class="info-item">
+            <label>License Number:</label>
+            <span>{{ driver.licenseNumber }}</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <h3>Vehicle Information</h3>
+          <div class="info-item">
+            <label>Model:</label>
+            <span>{{ driver.vehicleModel }}</span>
+          </div>
+          <div class="info-item">
+            <label>Registration:</label>
+            <span>{{ driver.vehicleRegNo }}</span>
+          </div>
+          <div class="info-item">
+            <label>Color:</label>
+            <span>{{ driver.vehicleColor }}</span>
+          </div>
+          <div class="info-item">
+            <label>Capacity:</label>
+            <span>{{ driver.capacity }} seats</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <h3>Account Status</h3>
+          <div class="info-item">
+            <label>Verified:</label>
+            <span [class]="driver.isVerified ? 'status-verified' : 'status-pending'">
+              {{ driver.isVerified ? 'Verified' : 'Pending' }}
+            </span>
+          </div>
+          <!-- <div class="info-item">
+            <label>Driver ID:</label>
+            <span>{{ driver.driverId }}</span>
+          </div>-->
+        </div> 
+      </div>
+
+      <button class="edit-btn" (click)="startEdit()">Edit Profile</button>
+    </div>
+
+    <!-- Profile Edit Mode -->
+    <div *ngIf="isEditing" class="profile-edit">
+      <h2>Edit Profile</h2>
+      
+      <form class="edit-form" *ngIf="editedDriver">
+        <div class="form-section">
+          <h3>Personal Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullName">Full Name *</label>
+              <input 
+                type="text" 
+                id="fullName" 
+                [(ngModel)]="editedDriver.fullName" 
+                name="fullName"
+                required 
+                minlength="2"
+                class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input 
+                type="email" 
+                id="email" 
+                [(ngModel)]="editedDriver.email" 
+                name="email"
+                required 
+                class="form-control" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number *</label>
+              <input 
+                type="tel" 
+                id="phoneNumber" 
+                [(ngModel)]="editedDriver.phoneNumber" 
+                name="phoneNumber"
+                required 
+                pattern="^[6-9][0-9]{9}$"
+                class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="licenseNumber">License Number *</label>
+              <input 
+                type="text" 
+                id="licenseNumber" 
+                [(ngModel)]="editedDriver.licenseNumber" 
+                name="licenseNumber"
+                required 
+                class="form-control" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Vehicle Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vehicleModel">Vehicle Model *</label>
+              <input 
+                type="text" 
+                id="vehicleModel" 
+                [(ngModel)]="editedDriver.vehicleModel" 
+                name="vehicleModel"
+                required 
+                class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="vehicleRegNo">Registration Number *</label>
+              <input 
+                type="text" 
+                id="vehicleRegNo" 
+                [(ngModel)]="editedDriver.vehicleRegNo" 
+                name="vehicleRegNo"
+                required 
+                class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vehicleColor">Vehicle Color *</label>
+              <select 
+                id="vehicleColor" 
+                [(ngModel)]="editedDriver.vehicleColor" 
+                name="vehicleColor"
+                required 
+                class="form-control">
+                <option value="">Select Color</option>
+                <option value="White">White</option>
+                <option value="Silver">Silver</option>
+                <option value="Black">Black</option>
+                <option value="Red">Red</option>
+                <option value="Blue">Blue</option>
+                <option value="Gray">Gray</option>
+                <option value="Green">Green</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="capacity">Seating Capacity *</label>
+              <select 
+                id="capacity" 
+                [(ngModel)]="editedDriver.capacity" 
+                name="capacity"
+                required 
+                class="form-control">
+                <option [value]="2">2 Seater</option>
+                <option [value]="4">4 Seater</option>
+                <option [value]="5">5 Seater</option>
+                <option [value]="6">6 Seater</option>
+                <option [value]="7">7 Seater</option>
+                <option [value]="8">8 Seater</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="cancel-btn" 
+            (click)="cancelEdit()"
+            [disabled]="isLoading">
+            Cancel
+          </button>
+          <button 
+            type="button" 
+            class="save-btn" 
+            (click)="saveProfile()"
+            [disabled]="!isFormValid() || isLoading">
+            {{ isLoading ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="!driver" class="loading">
+    Loading driver information...
+  </div>
+</div>

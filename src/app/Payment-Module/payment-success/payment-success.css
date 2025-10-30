@@ -1,36 +1,26 @@
-.payment-success {
-  max-width: 500px;
-  margin: 100px auto;
-  padding: 40px;
-  background-color: #f0f8ff;
-  border: 2px solid #007bff;
-  border-radius: 12px;
+.success-container {
   text-align: center;
-  font-family: 'Segoe UI', sans-serif;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.5s ease-in-out;
+  margin-top: 50px;
 }
 
-.payment-success h2 {
-  font-size: 28px;
-  color: #28a745;
-  margin-bottom: 20px;
+.stars {
+  font-size: 2rem;
+  color: gray;
+  cursor: pointer;
 }
 
-.payment-success p {
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 10px;
+.stars .selected {
+  color: gold;
 }
 
-.payment-success h1 {
-  font-size: 16px;
-  color: #555;
-  font-weight: normal;
+button {
   margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.thank-you {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: green;
 }

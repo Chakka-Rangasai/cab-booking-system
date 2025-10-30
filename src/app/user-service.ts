@@ -7,37 +7,46 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
- 
+  token: string | null = null
   responseMessage: string = '';
   userUpdatePassword:any={
      userId:null,
      userPassword:null
   }
- 
- 
   constructor(private httpClient :HttpClient){}
  
-  getUserDetailsObj(userObj1: any) {
-  this.httpClient.post("http://localhost:8080/postuserregisterdetails", userObj1, { responseType: 'text' })
-    .subscribe((res: string) => {
-      this.responseMessage = res; // Store the response for later use
-    });
+//  
+getUserDetailsObj(userObj1: any): Observable<any> {
+  return this.httpClient.post("http://localhost:8088/user/register", userObj1);
 }
+
  
  
-loginValidation(userLoginObj: any): Observable<HttpResponse<{ message: string }>> {
-  return this.httpClient.post<{ message: string }>(
-    "http://localhost:8080/validatelogindetails",
+loginValidation(userLoginObj: any): Observable<HttpResponse<{ token: string; message: string ,user:any}>> {
+  return this.httpClient.post<{ token: string; message: string ,user:any}>(
+    "http://localhost:8088/user/login",
     userLoginObj,
     {
       observe: 'response'
     }
+  ).pipe(
+    tap(response => {
+    const token = response.body?.token;
+    const user = response.body?.user;
+if (token) {
+  localStorage.setItem('jwtToken', token); // Store token for later use
+  this.token = token; // Optional: keep in memory
+}
+
+if (user) {
+  localStorage.setItem('userProfileDetails', JSON.stringify(user));
+}
+    })
   );
- 
 }
  forgetPasswordCredentials(userForgotPasswordObj: any): Observable<HttpResponse<{ message: string, user_id?: string }>> {
     return this.httpClient.post<{ message: string, user_id?: string }>(
-      'http://localhost:8080/validateuserforgotpassworddetails',
+      'http://localhost:8088/user/forgotpassword',
       userForgotPasswordObj,
       {
         observe: 'response'
@@ -56,13 +65,41 @@ loginValidation(userLoginObj: any): Observable<HttpResponse<{ message: string }>
   this.userUpdatePassword.userPassword = newPassword;
  
   return this.httpClient.put<{ message: string }>(
-    'http://localhost:8080/changepassword',
+    'http://localhost:8088/user/changepassword',
     this.userUpdatePassword,
     {
       observe: 'response'
     }
   );
 }
+
+updateUserProfile(userProileObj:any): Observable<HttpResponse<{ message: string }>> {
+  const token = this.getToken();
+  console.log("service called");
+  console.log('Token being sent:', token);
+  
+  return this.httpClient.put<{ message: string }>(
+    'http://localhost:8088/user/editprofile',
+    userProileObj,
+    {
+      observe: 'response',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+}
+
+getToken(): string | null {
+  return localStorage.getItem('jwtToken');
+}
+
+removeToken() {
+  // Remove the JWT token from localStorage
+  localStorage.removeItem('jwtToken');
+  localStorage.removeItem('userProfileDetails');
+}
+
 }
  
  

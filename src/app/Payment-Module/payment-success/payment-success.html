@@ -1,8 +1,19 @@
+<div class="success-container">
+  <h2>✅ Payment Successful!</h2>
 
-<div class="payment-success">
-  <h2>✅ Payment Successful</h2>
-  <p>Thank you for your ride!</p>
-  <h1> The page wil automatically redirect With in 3 seconds... 
-  </h1>
+  <!-- <div class="review-section" *ngIf="!submitted">
+    <p>Please rate your experience:</p>
+    <div class="stars">
+      <span *ngFor="let star of [1,2,3,4,5]" 
+            (click)="setRating(star)" 
+            [class.selected]="star <= rating">
+        ★
+      </span>
+    </div>
+    <button (click)="submitReview()">Submit Review</button>
+  </div> -->
+
+  <!-- <div *ngIf="submitted" class="thank-you">
+    <p>Thank you for your feedback!</p>
+  </div> -->
 </div>
-

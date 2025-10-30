@@ -1,54 +1,99 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
+import { RideHistoryService } from '../../ride-history-service';
+ 
 @Component({
   selector: 'app-tripdetails',
-  imports: [FormsModule,CommonModule],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './tripdetails.html',
-  styleUrl: './tripdetails.css'
+  styleUrls: ['./tripdetails.css']
 })
-export class Tripdetails {
-  rapidoTrips = [
-    {
-      pickup: 'Baner Road',
-      drop: 'FC Road',
-      fare: 85,
-      driver: 'Ravi Kumar',
-      time: '4:30 PM',
-      payment:'UPI'
-    },
-    {
-      pickup: 'Hinjewadi Phase 2',
-      drop: 'Pune Station',
-      fare: 120,
-      driver: 'Sneha Patil',
-      time: '5:15 PM',
-      payment:'CASH'
-    },
-    {
-      pickup: 'Kothrud',
-      drop: 'Magarpatta',
-      fare: 150,
-      driver: 'Amit Joshi',
-      time: '6:00 PM',
-      payment:'UPI'
-    },
-    {
-      pickup: 'Hinjewadi Phase 1',
-      drop: 'Koregaon Park',
-      fare: 120,
-      driver: 'Sneha Patil',
-      time: '6:15 PM',
-      payment: 'Cash'
-    },
-    {
-      pickup: 'Aundh',
-      drop: 'Swargate',
-      fare: 95,
-      driver: 'Mohit Deshmukh',
-      time: '5:45 PM',
-      payment: 'Card'
+export class TripdetailsComponent implements OnInit {
+  rideHistory: any[] = [];
+  loading: boolean = true;
+  error: string | null = null;
+ 
+  constructor(
+    private rideService: RideHistoryService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
+ 
+  ngOnInit(): void {
+    this.fetchRideHistory();
+  }
+ 
+  private fetchRideHistory(): void {
+    this.loading = true;
+    this.error = null;
+ 
+    // Retrieve user profile from localStorage
+    const userProfile = localStorage.getItem('userProfileDetails');
+    console.log('Checking localStorage for userProfileDetails:', userProfile);
+ 
+    if (!userProfile) {
+      console.error('No user profile found in localStorage');
+      this.error = 'User session not found. Please log in again.';
+      this.loading = false;
+      setTimeout(() => {
+        this.router.navigate(['/main/userlogin']);
+      }, 2000);
+      return;
     }
-];
+ 
+    let userId: number | undefined;
+    try {
+      const parsedProfile = JSON.parse(userProfile);
+      console.log('Parsed user profile:', parsedProfile);
+      userId = parsedProfile.userId;
+      console.log('Extracted userId:', userId);
+    } catch (e) {
+      console.error('Failed to parse userProfileDetails:', e);
+      this.error = 'Invalid session data. Please log in again.';
+      this.loading = false;
+      setTimeout(() => {
+        this.router.navigate(['/main/userlogin']);
+      }, 2000);
+      return;
+    }
+ 
+    if (!userId) {
+      console.error('User ID is missing or invalid');
+      this.error = 'User ID not found. Please log in again.';
+      this.loading = false;
+      setTimeout(() => {
+        this.router.navigate(['/main/userlogin']);
+      }, 2000);
+      return;
+    }
+ 
+    console.log('Fetching ride history for userId:', userId);
+ 
+    // Fetch ride history from the service
+    this.rideService.getRideHistory(userId).subscribe({
+      next: (data) => {
+        console.log('Raw API response:', data);
+        this.rideHistory = Array.isArray(data) ? data : [];
+        console.log('Processed ride history:', this.rideHistory);
+ 
+        if (this.rideHistory.length === 0) {
+          console.warn('No rides found for the user.');
+        }
+ 
+        this.loading = false;
+        this.error = null;
+        this.cdr.markForCheck(); // Trigger view update
+      },
+      error: (err) => {
+        console.error('Error fetching ride history:', err);
+        this.error = 'Failed to load ride history. Please try again later.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
 }
+ 
+ 

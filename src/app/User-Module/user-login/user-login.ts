@@ -14,47 +14,43 @@ import { UserService } from '../../user-service';
 })
 export class UserLogin {
 userLoginObj = {
-    userName: '',
-    userPassword: ''
+    email: '',
+    password: ''
   };
   errorMessage="";
  
   constructor(private router: Router,private userService:UserService) {}
  
   onLogin() {
-    if (!this.userLoginObj.userName && !this.userLoginObj.userPassword) {
+    if (!this.userLoginObj.email && !this.userLoginObj.password) {
       alert('Please enter username and password.');
       return;
     }
  
-    if (!this.userLoginObj.userName) {
+    if (!this.userLoginObj.email) {
       alert('Please enter username.');
       return;
     }
  
-    if (!this.userLoginObj.userPassword) {
+    if (!this.userLoginObj.password) {
       alert('Please enter password.');
       return;
     }
    
-    this.userService.loginValidation(this.userLoginObj).subscribe({
+   this.userService.loginValidation(this.userLoginObj).subscribe({
   next: (response) => {
-    const message = response.body?.message;
- 
-    if (message) {
-      alert(message); // Shows "Login successful"
-      if (message === 'Login successful') {
-        this.router.navigate(['/userhomenav']);
-      }
+      if(this.userService.getToken()){
+        alert('Login Successful');
+      this.router.navigate(['/userhomenav']); // Navigate on successful token
     } else {
-      alert('Unexpected response from server.');
+      alert('Login failed: Token not received.');
     }
   },
   error: (error) => {
     const errorMessage = error.error?.message || 'Something went wrong';
     alert(errorMessage); // Shows "User not found" or "Invalid password"
   }
-     });
+   });
   }
   onClickRegister() {
     this.router.navigate(['/main/userregister']);
