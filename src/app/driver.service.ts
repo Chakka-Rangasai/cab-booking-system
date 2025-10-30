@@ -210,12 +210,14 @@ export class DriverService {
 
   // Get driver average rating (public by default, pass true to use auth)
   getDriverAverage(driverId: number, useAuth: boolean = false) {
-    const url = `${this.baseUrl}/reviews/driver/${driverId}/average`;
+    const drivetoken =localStorage.getItem('driverToken')
+    console.log("this is the driver token "+drivetoken);
+  const headers = new HttpHeaders({
+      'Authorization': `Bearer ${drivetoken}`
+    });
+    const url = `http://localhost:8077/reviews/driver/${driverId}/average`;
     this.logApiRequest('GET', url);
-    if (useAuth) {
-      return this.httpClient.get<number>(url, { headers: this.getAuthHeaders() });
-    }
-    return this.httpClient.get<number>(url);
+    return this.httpClient.get<number>(url,{headers});
   }
 
   private getStoredDriver(): DriverInfo | null {
@@ -242,7 +244,11 @@ export class DriverService {
   }
 
   getPendingRides() {
-    return this.httpClient.get<any[]>("http://localhost:8087/driver/pending");
+     const drivetoken =localStorage.getItem('driverToken')
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${drivetoken}`
+    });
+    return this.httpClient.get<any[]>("http://localhost:8087/driver/pending",{headers});
   }
 
   acceptRideRequest(rideId: number, driverId: number) {
@@ -288,7 +294,29 @@ export class DriverService {
   }
 
 
-
+    // Forgot password - verify email and phone number
+  verifyForgotPasswordCredentials(email: string, phoneNumber: string): Observable<HttpResponse<{message: string, driver_id: string}>> {
+    const url = `${this.baseUrl}/forgotpassword`;
+    const forgotPasswordData = { email, phoneNumber };
+   
+    this.logApiRequest('POST', url, forgotPasswordData);
+   
+    return this.httpClient.post<{message: string, driver_id: string}>(url, forgotPasswordData, {
+      observe: 'response'
+    });
+  }
+ 
+  // Change password after OTP verification
+  changePassword(driverData: { driverId: string , passwordHash: string }): Observable<HttpResponse<{message: string}>> {
+    const url = `${this.baseUrl}/changepassword`;
+   
+    this.logApiRequest('PUT', url, driverData);
+   
+    return this.httpClient.put<{message: string}>(url, driverData, {
+      observe: 'response'
+    });
+  }
+ 
 }
 
 

@@ -114,13 +114,22 @@
                 <div class="info-content">
                   <span class="info-label">Amount</span>
                   <span class="info-value amount">₹{{ bookingDetails?.amount }}</span>
-                </div>
+               </div>
               </div>
             </div>
+            </div>
           </div>
+             <div class="button-container">
+          <button 
+            (click)="goToPayment()" 
+            class="pay-button"
+            [class.paid]="paymentDone"
+            [disabled]="paymentDone">
+            {{ paymentDone ? 'Payment Done' : 'Pay Now' }}
+          </button>
+        </div>
         </div>
       </div>
-    </div>
 
     <!-- Completed State -->
     <div *ngIf="status == 'completed'" class="status completed">
@@ -156,14 +165,44 @@
 
         <div class="driver-rating">
           <h4>Rate Your Driver</h4>
+          <hr class="driver-divider">
           <p>How was your experience with {{ bookingDetails?.driver?.name }}?</p>
+          
+          <!-- Show driver's average rating -->
+          <div class="average-rating" *ngIf="driverAverageRating > 0">
+            <span class="average-label">Driver's Average Rating: </span>
+            <span class="average-value">{{ driverAverageRating | number:'1.1-1' }} ⭐</span>
+          </div>
+          
           <div class="rating-stars">
             <span *ngFor="let star of [1,2,3,4,5]" 
                   class="star" 
-                  (click)="rateDriver(star)">
+                  [class.selected]="star <= driverReview.rating"
+                  (click)="rateDriver(star)"
+                  (mouseenter)="onStarHover(star)"
+                  (mouseleave)="onStarLeave()">
               ⭐
             </span>
           </div>
+          
+          <div class="review-box">
+            <label for="driverReview">Write a review (optional):</label>
+            <textarea 
+              id="driverReview" 
+              [(ngModel)]="driverReview.reviewText" 
+              rows="3" 
+              placeholder="Share your feedback about your ride experience..."
+              maxlength="500"
+              [disabled]="isRatingSubmitted">
+            </textarea>
+          </div>
+          
+          <button 
+            class="submit-rating-btn" 
+            (click)="submitDriverRating()" 
+            [disabled]="driverReview.rating === 0 || isRatingSubmitted">
+            {{ isRatingSubmitted ? 'Rating Submitted' : 'Submit Rating' }}
+          </button>
         </div>
 
         <div class="action-buttons">

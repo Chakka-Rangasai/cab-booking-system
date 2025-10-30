@@ -21,10 +21,12 @@ import { Component } from '@angular/core';
 import { Main } from './Home-Module/main/main';
 import { Home } from './Home-Module/home/home';
 import { DrivermainNav } from './Driver-Module/drivermain-nav/drivermain-nav';
-import { Tripdetails } from './RideBooking-Module/tripdetails/tripdetails';
+import { TripdetailsComponent } from './RideBooking-Module/tripdetails/tripdetails';
 import { UserProfile } from './User-Module/user-profile/user-profile';
 import { AuthGuard } from './auth-guard';
 import { BookingWaiting } from './RideBooking-Module/booking-waiting/booking-waiting';
+import { Payment } from './Payment-Module/payment/payment';
+import { PaymentSuccessComponent } from './Payment-Module/payment-success/payment-success';
 // import { UserProfile } from './user-profile/user-profile';
 export const routes: Routes = [
     {
@@ -91,8 +93,10 @@ export const routes: Routes = [
     children: [
       { path: '', component: Userhome }, // default child route
       { path: 'cnf-booking', component: Cnfbooking },
-      {path:'tripdetails',component:Tripdetails},
+      {path:'tripdetails',component:TripdetailsComponent},
       {path:'userprofile',component:UserProfile},
+       { path:'payment',component:Payment},
+      {path:'paymentsuccess',component:PaymentSuccessComponent},
       {path:'booking-waiting',component:BookingWaiting},
       { path:'booking-confirmation',component:BookingConfirmationCard}
     ]

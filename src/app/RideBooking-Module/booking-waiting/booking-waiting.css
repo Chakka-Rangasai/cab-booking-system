@@ -568,6 +568,62 @@
   border-color: #667eea;
 }
 
+/* Payment Button Styling */
+.pay-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  margin-top: 1rem;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pay-button:hover:not(.paid) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+}
+
+.pay-button:active:not(.paid) {
+  transform: translateY(0);
+}
+
+/* Payment button when payment is completed */
+.pay-button.paid,
+.pay-button:disabled {
+  background: #6c757d !important;
+  color: #adb5bd !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: auto;
+}
+
+.pay-button.paid:hover,
+.pay-button:disabled:hover {
+  background: #6c757d !important;
+  transform: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+/* Button Container */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 0 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .page-wrapper {
@@ -723,6 +779,29 @@
   font-size: 0.95rem;
 }
 
+/* Average Rating Display */
+.average-rating {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.average-label {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.average-value {
+  color: #ffc107;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
 .rating-stars {
   display: flex;
   justify-content: center;
@@ -734,15 +813,101 @@
   cursor: pointer;
   transition: all 0.3s ease;
   filter: grayscale(100%);
+  opacity: 0.6;
 }
 
 .star:hover {
   transform: scale(1.2);
   filter: grayscale(0%);
+  opacity: 1;
 }
 
 .star:active {
   transform: scale(0.9);
+}
+
+.star.selected {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Review Box Styling */
+.review-box {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.review-box label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.review-box textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #fff;
+  resize: vertical;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.review-box textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.review-box textarea:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  border-color: #e9ecef;
+}
+
+.review-box textarea::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Submit Button Styling */
+.submit-rating-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.submit-rating-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.submit-rating-btn:active {
+  transform: translateY(0);
+}
+
+.submit-rating-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .completed .action-buttons {

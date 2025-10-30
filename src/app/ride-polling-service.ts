@@ -31,7 +31,12 @@ export class RidePollingService {
           return EMPTY;
         }
         
-        return this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`).pipe(
+        return this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`,
+          {
+          headers: {
+                         'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                  }
+      }).pipe(
           catchError(err => {
             console.warn('Polling error:', err);
             return of(null); // Continue polling even if error occurs
@@ -61,7 +66,13 @@ export class RidePollingService {
               
               // Only fetch driver details if we don't have them yet
               if (!currentDetails || !currentDetails.driver) {
-                this.http.get(`http://localhost:8087/driver/${res.acceptedDriverId}`).pipe(
+                this.http.get(`http://localhost:8087/driver/${res.acceptedDriverId}`,
+                  {
+                    headers: {
+                         'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                  }
+                  }
+                ).pipe(
                   catchError(() => {
                     res.driver = { name: 'Unknown', carNumber: 'N/A', phoneNumber: 'N/A' };
                     return of(res); // Return modified response even on error
@@ -106,7 +117,11 @@ export class RidePollingService {
       return;
     }
 
-    this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`).pipe(
+  this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`,{
+    headers: {
+                         'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+            }
+  }).pipe(
       catchError(err => {
         console.warn('Error checking ride completion:', err);
         return of(null);
