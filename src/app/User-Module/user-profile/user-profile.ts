@@ -1,8 +1,9 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserService } from '../../user-service';
 
 @Component({
@@ -29,7 +30,12 @@ export class UserProfile implements OnInit {
   isEditing = false;
 
   private platformId = inject(PLATFORM_ID);
-  constructor(private userService:UserService){
+  
+  constructor(
+    private userService: UserService,
+    private location: Location,
+    private router: Router
+  ) {
       
   }
 

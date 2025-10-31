@@ -31,7 +31,12 @@ export class RidePollingService {
           return EMPTY;
         }
         
-        return this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`).pipe(
+        return this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`,
+              {
+                  headers: {
+                         'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                  }
+              }).pipe(
           catchError(err => {
             console.warn('Polling error:', err);
             return of(null); // Continue polling even if error occurs
