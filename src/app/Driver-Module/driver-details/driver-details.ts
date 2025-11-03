@@ -28,87 +28,19 @@ export class DriverDetails implements OnInit {
 
   // Ride request and history data with better mock data
   pendingRides: any[] = [];
+  ongoingRides: any[] = [];
   rideHistory: any[] = [];
-
-
-  // rideRequests = [
-  //   { 
-  //     id: 1,
-  //     pickup: 'Baner Cross Road', 
-  //     drop: 'Kothrud Station', 
-  //     fare: 220,
-  //     distance: '8.5',
-  //     estimatedTime: '18',
-  //     customerName: 'Rahul S.',
-  //     customerRating: 4.8
-  //   },
-  //   { 
-  //     id: 2,
-  //     pickup: 'Hinjewadi Phase 2', 
-  //     drop: 'Shivajinagar Bus Stop', 
-  //     fare: 350,
-  //     distance: '12.3',
-  //     estimatedTime: '25',
-  //     customerName: 'Priya M.',
-  //     customerRating: 4.9
-  //   },
-  //   { 
-  //     id: 3,
-  //     pickup: 'Pune Airport', 
-  //     drop: 'Deccan Gymkhana', 
-  //     fare: 450,
-  //     distance: '15.2',
-  //     estimatedTime: '30',
-  //     customerName: 'Amit K.',
-  //     customerRating: 4.7
-  //   }
-  // ];
-
-  // rideHistory = [
-  //   { 
-  //     date: 'Oct 13', 
-  //     pickup: 'Wakad IT Park', 
-  //     drop: 'FC Road Metro', 
-  //     fare: 220,
-  //     customerRating: 5.0,
-  //     duration: '22 min'
-  //   },
-  //   { 
-  //     date: 'Oct 12', 
-  //     pickup: 'Aundh ATI', 
-  //     drop: 'Viman Nagar Airport Road', 
-  //     fare: 340,
-  //     customerRating: 4.8,
-  //     duration: '28 min'
-  //   },
-  //   { 
-  //     date: 'Oct 11', 
-  //     pickup: 'Magarpatta City', 
-  //     drop: 'Koregaon Park', 
-  //     fare: 180,
-  //     customerRating: 4.9,
-  //     duration: '15 min'
-  //   },
-  //   { 
-  //     date: 'Oct 10', 
-  //     pickup: 'Hadapsar', 
-  //     drop: 'Camp Area', 
-  //     fare: 280,
-  //     customerRating: 4.6,
-  //     duration: '32 min'
-  //   }
-  // ];
 
   ngOnInit() {
     this.loadDriverInfo();
     // Only load rides if in browser environment
     if (isPlatformBrowser(this.platformId)) {
       this.loadPendingRides();
+      this.loadOngoingRides();
       this.loadConfirmedRides();
     }
   }
 
-  
 
   loadDriverInfo() {
     if (isPlatformBrowser(this.platformId)) {
@@ -128,52 +60,7 @@ export class DriverDetails implements OnInit {
     }
   }
 
-  loadPendingRides() {
-    // Only make HTTP requests in browser environment
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
-    
-    this.driverService.getPendingRides().subscribe({
-      next: (rides) => {
-        this.pendingRides = rides;
-        console.log('Fetched pending rides:', rides);
-        rides.forEach(ride => {
-          console.log('Fetched pending ride:', ride.requestId);
-        });
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error fetching pending rides:', err);
-      }
-    });
-  }
-
-  loadConfirmedRides() {
-    // Only make HTTP requests in browser environment
-    if (!isPlatformBrowser(this.platformId) || !this.driver?.driverId) {
-      return;
-    }
-    
-    this.driverService.getConfirmedRidesByDriver(this.driver.driverId).subscribe({
-      next: (rides) => {
-        this.rideHistory = rides.map(ride => ({
-          date: new Date().toLocaleDateString(), // You can replace this with actual ride date if available
-          pickup: ride.origin,
-          drop: ride.destination,
-          fare: ride.amount,
-          customerRating: 4.8, // Placeholder if rating is not available
-          duration: ride.distance + ' km' // Or calculate duration if available
-        }));
-        console.log('✅ Confirmed rides loaded:', this.rideHistory);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('❌ Error loading confirmed rides:', err);
-      }
-    });
-  }
-
+  
   private fetchAverage() {
     if (!this.driver?.driverId) {
       console.warn('fetchAverage: missing driverId');
@@ -185,12 +72,19 @@ export class DriverDetails implements OnInit {
       next: (val: number) => {
         this.averageRating = typeof val === 'number' ? val : Number(val);
         console.log('fetchAverage success raw:', val, 'stored averageRating:', this.averageRating);
-        // Force change detection to update UI immediately
-        this.cdr.detectChanges();
+        console.log('fetchAverage - current isLoading state:', this.isLoading);
+        // Only trigger change detection if not currently in a loading state
+        if (!this.isLoading) {
+          this.cdr.markForCheck();
+        }
       },
       error: (err) => {
         console.error('fetchAverage error status:', err?.status, 'body:', err?.error);
         this.averageRating = null;
+        // Only trigger change detection if not currently in a loading state
+        if (!this.isLoading) {
+          this.cdr.markForCheck();
+        }
       }
     });
   }
@@ -206,19 +100,55 @@ export class DriverDetails implements OnInit {
   // Toggle availability with backend integration
   toggleAvailability() {
     if (!this.driver?.driverId) return;
+    
     const newAvailability = !this.driver.isAvailable;
+    console.log('Toggling availability from', this.driver.isAvailable, 'to', newAvailability);
+    
+    // Set loading state
     this.isLoading = true;
+    this.cdr.markForCheck(); // Force UI update for loading state
+    
     this.driverService.toggleAvailability(this.driver.driverId, newAvailability).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('Availability toggle successful:', response);
+        
+        // Update the driver object immediately
         this.driver!.isAvailable = newAvailability;
+        
+        // Update localStorage with new status
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('driverInfo', JSON.stringify(this.driver));
         }
-        this.fetchAverage();
+        
+        // Update editedDriver as well if it exists
+        if (this.editedDriver) {
+          this.editedDriver.isAvailable = newAvailability;
+        }
+        
+        // Reset loading state FIRST
         this.isLoading = false;
-        alert('Availability updated');
+        
+        // Force change detection to update UI immediately
+        this.cdr.markForCheck();
+        
+        // Show success message
+        const statusText = newAvailability ? 'Available' : 'Unavailable';
+        alert(`Status updated to: ${statusText}`);
+        
+        // Refresh average rating (but don't let it interfere with loading state)
+        this.fetchAverage();
       },
-      error: () => { this.isLoading = false; alert('Failed to update availability'); }
+      error: (error) => {
+        console.error('Failed to update availability:', error);
+        
+        // Reset loading state FIRST
+        this.isLoading = false;
+        
+        // Force change detection
+        this.cdr.markForCheck();
+        
+        alert('Failed to update availability. Please try again.');
+      }
     });
   }
 
@@ -239,95 +169,127 @@ export class DriverDetails implements OnInit {
 
   saveProfile() {
     if (!this.editedDriver) return;
+    
+    console.log('Saving profile with data:', this.editedDriver);
     this.isLoading = true;
+    
     this.driverService.updateDriverProfile(this.editedDriver).subscribe({
       next: (resp: any) => {
+        console.log('Profile update successful:', resp);
+        
+        // Update the main driver object
         this.driver = resp.body!;
         this.ensureDriverFlags(this.driver);
+        
+        // Create a fresh copy for editing
         this.editedDriver = this.createDriverCopy(this.driver!);
+        
+        // Update localStorage
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('driverInfo', JSON.stringify(this.driver));
         }
+        
+        // Force change detection
+        this.cdr.markForCheck();
+        
         this.isEditing = false;
         this.isLoading = false;
+        
         alert('Profile successfully updated');
       },
-      error: () => {
+      error: (error) => {
+        console.error('Profile update failed:', error);
         this.isLoading = false;
-        alert('Failed to update profile');
+        alert('Failed to update profile. Please try again.');
       }
     });
   }
 
-  // Ride booking methods with better functionality
-  // acceptRide(ride: any) {
-  //   console.log('🚗 Accepting ride:', ride);
+  loadPendingRides() {
+    // Only make HTTP requests in browser environment
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
     
-  //   // Simulate ride acceptance
-  //   const confirmAccept = confirm(`Accept ride from ${ride.pickup} to ${ride.drop}?\nFare: ₹${ride.fare}\nCustomer: ${ride.customerName || 'Unknown'}`);
-    
-  //   if (confirmAccept) {
-  //     // Remove from requests
-  //     this.rideRequests = this.rideRequests.filter(r => r.id !== ride.id);
-      
-  //     // Add to history
-  //     const today = new Date();
-  //     const dateStr = today.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-      
-  //     this.rideHistory.unshift({
-  //       date: dateStr,
-  //       pickup: ride.pickup,
-  //       drop: ride.drop,
-  //       fare: ride.fare,
-  //       customerRating: ride.customerRating || 4.5,
-  //       duration: ride.estimatedTime + ' min'
-  //     });
-      
-  //     alert(`✅ Ride accepted! Navigate to pickup location: ${ride.pickup}`);
-      
-  //     // TODO: Integrate with backend ride acceptance API
-  //     // this.driverService.acceptRide(ride.id).subscribe(...)
-  //   }
-  // }
+    this.driverService.getPendingRides().subscribe({
+      next: (rides) => {
+        this.pendingRides = rides;
+        console.log('Fetched pending rides:', rides);
+        rides.forEach(ride => {
+          console.log('Fetched pending ride:', ride.requestId);
+        });
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error fetching pending rides:', err);
+      }
+    });
+  }
 
-  // acceptRide(ride: any) {
-  //   const confirmAccept = confirm(`Accept ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);
-  //   if (confirmAccept) {
-  //     this.pendingRides = this.pendingRides.filter(r => r.requestId !== ride.requestId);
-  //     const today = new Date();
-  //     const dateStr = today.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-  //     this.rideHistory.unshift({
-  //       date: dateStr,
-  //       pickup: ride.origin,
-  //       drop: ride.destination,
-  //       fare: ride.amount,
-  //       customerRating: 4.5,
-  //       duration: '—'
-  //     });
-  //     alert(`✅ Ride accepted! Navigate to pickup location: ${ride.origin}`);
-  //     // TODO: Integrate with backend ride acceptance API
-  //   }
-  // }
+  loadConfirmedRides() {
+    // Only make HTTP requests in browser environment
+    if (!isPlatformBrowser(this.platformId) || !this.driver?.driverId) {
+      return;
+    }
+    
+    this.driverService.getCompletedRidesByDriver(this.driver.driverId).subscribe({
+      next: (rides) => {
+        this.rideHistory = rides.map(ride => ({
+          // date: new Date().toLocaleDateString(), // You can replace this with actual ride date if available
+          pickup: ride.origin,
+          drop: ride.destination,
+          fare: ride.amount,
+          // customerRating: 4.8, // Placeholder if rating is not available
+          duration: ride.distance // Or calculate duration if available
+        }));
+        console.log('Confirmed rides loaded:', this.rideHistory);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error(' Error loading confirmed rides:', err);
+      }
+    });
+  }
+
+  loadOngoingRides() {
+    // Only make HTTP requests in browser environment
+    if (!isPlatformBrowser(this.platformId) || !this.driver?.driverId) {
+      return;
+    }
+    
+    this.driverService.getOngoingRidesByDriver(this.driver.driverId).subscribe({
+      next: (rides) => {
+        this.ongoingRides = rides;
+        console.log('Fetched ongoing rides:', rides);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error fetching ongoing rides:', err);
+      }
+    });
+  }
+
 
 acceptRide(ride: any) {
   const confirmAccept = confirm(`Accept ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);
   if (!confirmAccept || !this.driver?.driverId) return;
+  
+  console.log('Accepting ride:', ride.requestId, 'for driver:', this.driver.driverId);
+  
   this.driverService.acceptRideRequest(ride.requestId, this.driver.driverId).subscribe({
-    next: () => {
+    next: (response) => {
+      console.log('Ride acceptance successful:', response);
+      
+      // Remove from pending rides immediately
       this.pendingRides = this.pendingRides.filter(r => r.requestId !== ride.requestId);
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-      this.rideHistory.unshift({
-        date: dateStr,
-        pickup: ride.origin,
-        drop: ride.destination,
-        fare: ride.amount,
-        customerRating: 4.5,
-        duration: '—'
-      });
+      
+      // Add to ongoing rides
+      this.ongoingRides.push(ride);
+      
+      // Force change detection to update UI immediately
+      this.cdr.markForCheck();
+      
       alert(`✅ Ride accepted! Navigate to pickup location: ${ride.origin}`);
-    
-  //this.ridePollingService.pollConfirmedRide(this.driver.driverId, ride.requestId);
     },
     error: (err) => {
       console.error('Failed to accept ride:', err);
@@ -336,21 +298,37 @@ acceptRide(ride: any) {
   });
 }
 
-
-  // rejectRide(ride: any) {
-  //   console.log('❌ Rejecting ride:', ride);
-    
-  //   const confirmReject = confirm(`Reject ride from ${ride.pickup} to ${ride.drop}?\nFare: ₹${ride.fare}`);
-    
-  //   if (confirmReject) {
-  //     // Remove from requests
-  //     this.rideRequests = this.rideRequests.filter(r => r.id !== ride.id);
-  //     alert('❌ Ride rejected. Looking for more requests...');
+completeRide(ride: any) {
+  const confirmComplete = confirm(`Complete ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);
+  if (!confirmComplete || !this.driver?.driverId) return;
+  
+  console.log('Completing ride:', ride.requestId, 'for driver:', this.driver.driverId);
+  
+  this.driverService.completeRide(ride.requestId, this.driver.driverId).subscribe({
+    next: (response) => {
+      console.log('Ride completion successful:', response);
       
-  //     // TODO: Integrate with backend ride rejection API  
-  //     // this.driverService.rejectRide(ride.id).subscribe(...)
-  //   }
-  // }
+      // Remove from ongoing rides
+      this.ongoingRides = this.ongoingRides.filter(r => r.requestId !== ride.requestId);
+      
+      // Reload pending rides and other data
+      this.loadPendingRides();
+      this.loadConfirmedRides();
+      
+      // Force change detection to update UI immediately
+      this.cdr.markForCheck();
+      
+      alert(`✅ Ride completed successfully! Payment of ₹${ride.amount} processed.`);
+    },
+    error: (err) => {
+      console.error('Failed to complete ride:', err);
+      alert('❌ Failed to complete ride. Please try again.');
+    }
+  });
+}
+
+
+
 
    rejectRide(ride: any) {
     const confirmReject = confirm(`Reject ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);

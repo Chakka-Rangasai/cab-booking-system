@@ -214,30 +214,8 @@
     </form>
   </div>
  
-  <!-- Incoming Ride Requests (only show when available and not editing) -->
-  <!-- <div *ngIf="!isEditing && driver.isAvailable && rideRequests.length > 0" class="ride-requests">
-    <h3>Incoming Ride Requests</h3>
-    <div class="requests-container">
-      <div *ngFor="let ride of rideRequests; trackBy: trackByIndex" class="ride-card">
-        <div class="ride-info">
-          <div class="ride-detail">
-            <strong>Pickup:</strong> {{ ride.pickup }}
-          </div>
-          <div class="ride-detail">
-            <strong>Drop:</strong> {{ ride.drop }}
-          </div>
-          <div class="ride-detail fare">
-            <strong>Fare:</strong> ₹{{ ride.fare }}
-          </div>
-        </div>
-        <div class="ride-actions">
-          <button class="accept-btn" (click)="acceptRide(ride)">Accept</button>
-          <button class="reject-btn" (click)="rejectRide(ride)">Reject</button>
-        </div>
-      </div>
-    </div>
-  </div> -->
-  <div *ngIf="!isEditing && driver?.isAvailable && pendingRides.length > 0" class="ride-requests">
+  <!-- Incoming Ride Requests (only show when available, not editing, and no ongoing rides) -->
+  <div *ngIf="!isEditing && driver?.isAvailable && pendingRides.length > 0 && ongoingRides.length === 0" class="ride-requests">
   <h3>Incoming Ride Requests</h3>
   <div class="requests-container">
     <div *ngFor="let ride of pendingRides; trackBy: trackByIndex" class="ride-card">
@@ -266,6 +244,43 @@
   </div>
 </div>
 
+  <!-- Ride Ongoing Section (show ongoing rides) -->
+  <div *ngIf="!isEditing && ongoingRides.length > 0" class="ride-requests ongoing-section">
+    <h3>🚗 Ride Ongoing</h3>
+    <div class="requests-container">
+      <div *ngFor="let ride of ongoingRides; trackBy: trackByIndex" class="ride-card ongoing-ride">
+        <div class="ride-info">
+          <div class="ride-detail">
+            <strong>Pickup:</strong> {{ ride.origin }}
+          </div>
+          <div class="ride-detail">
+            <strong>Drop:</strong> {{ ride.destination }}
+          </div>
+          <div class="ride-detail fare">
+            <strong>Fare:</strong> ₹{{ ride.amount }}
+          </div>
+          <div class="ride-detail">
+            <strong>Distance:</strong> {{ ride.distance }}
+          </div>
+          <div class="ride-detail">
+            <strong>User ID:</strong> {{ ride.userId }}
+          </div>
+        </div>
+        <div class="ride-actions">
+          <button class="complete-ride-btn" (click)="completeRide(ride)">Complete Ride</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message when no rides available and no ongoing rides -->
+  <div *ngIf="!isEditing && driver?.isAvailable && pendingRides.length === 0 && ongoingRides.length === 0" class="no-rides">
+    <h3>🔍 Looking for rides...</h3>
+    <p>No ride requests at the moment. Make sure you're online and available!
+      To get the rides 
+    </p>
+  </div>
+
 
   <!-- Ride History (only show when not editing) -->
   <!-- <div *ngIf="!isEditing" class="ride-history">
@@ -288,11 +303,11 @@
   <div class="history-container">
     <div *ngFor="let history of rideHistory; trackBy: trackByIndex" class="history-item">
       <div class="history-detail">
-        <span class="history-date"><strong>Date:</strong> {{ history.date }}</span>
+        <!-- <span class="history-date"><strong>Date:</strong> {{ history.date }}</span> -->
         <span class="history-route"><strong>Route:</strong> {{ history.pickup }} → {{ history.drop }}</span>
         <span class="history-fare"><strong>Fare:</strong> ₹{{ history.fare }}</span>
         <span class="history-distance"><strong>Distance:</strong> {{ history.duration }}</span>
-        <span class="history-rating"><strong>Rating:</strong> {{ history.customerRating }}</span>
+        <!-- <span class="history-rating"><strong>Rating:</strong> {{ history.customerRating }}</span> -->
       </div>
     </div>
     <div *ngIf="rideHistory.length === 0" class="no-history">

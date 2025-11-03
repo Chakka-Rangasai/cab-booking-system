@@ -22,7 +22,7 @@ export interface DriverInfo {
   providedIn: 'root'
 })
 export class DriverService {
-  private baseUrl = 'http://localhost:8087/driver';
+  private baseUrl = 'http://localhost:8080/driver-api/driver';
 
   constructor(private httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     console.log('DriverService initialized with baseUrl:', this.baseUrl);
@@ -167,7 +167,7 @@ export class DriverService {
 
   // Toggle driver availability
   toggleAvailability(driverId: number, isAvailable: boolean): Observable<HttpResponse<string>> {
-    const url = `${this.baseUrl}/${driverId}/${isAvailable}`;
+    const url = `${this.baseUrl}/check/${driverId}/${isAvailable}`;
     const headers = this.getAuthHeaders();
     
     this.logApiRequest('PATCH', url);
@@ -210,12 +210,14 @@ export class DriverService {
 
   // Get driver average rating (public by default, pass true to use auth)
   getDriverAverage(driverId: number, useAuth: boolean = false) {
-    const url = `${this.baseUrl}/reviews/driver/${driverId}/average`;
+    const drivetoken =localStorage.getItem('driverToken')
+    console.log("this is the driver token "+drivetoken);
+  const headers = new HttpHeaders({
+      'Authorization': `Bearer ${drivetoken}`
+    });
+    const url = `http://localhost:8080/review-api/reviews/driver/${driverId}/average`;
     this.logApiRequest('GET', url);
-    if (useAuth) {
-      return this.httpClient.get<number>(url, { headers: this.getAuthHeaders() });
-    }
-    return this.httpClient.get<number>(url);
+    return this.httpClient.get<number>(url,{headers});
   }
 
   private getStoredDriver(): DriverInfo | null {
@@ -228,6 +230,10 @@ export class DriverService {
     return null;
   }
 
+
+
+
+  
   getCurrentDriverAverage() {
     const stored = this.getStoredDriver();
     if (!stored?.driverId) {
@@ -238,24 +244,27 @@ export class DriverService {
   }
 
   getPendingRides() {
-     const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${this.getAuthToken() || ''}`
-  });
-    return this.httpClient.get<any[]>("http://localhost:8087/driver/pending",{ headers });
+     const drivetoken =localStorage.getItem('driverToken')
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${drivetoken}`
+    });
+    return this.httpClient.get<any[]>("http://localhost:8080/driver-api/driver/pending",{headers});
   }
 
-  acceptRideRequest(rideId: number, userId: number) {
-    const url = `http://localhost:8087/driver/acceptride/${rideId}/${userId}`;
-     const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${this.getAuthToken() || ''}`
-  });
-    return this.httpClient.get(url,{ headers }); // No body needed for this PATCH
+  acceptRideRequest(rideId: number, driverId: number) {
+    const url = `http://localhost:8080/driver-api/driver/acceptride/${rideId}/${driverId}`;
+
+    const drivetoken =localStorage.getItem('driverToken')
+    console.log("this is the driver token "+drivetoken);
+  const headers = new HttpHeaders({
+      'Authorization': `Bearer ${drivetoken}`
+    });
+
+    return this.httpClient.post(url, {},{headers}); 
   }
 
-  getConfirmedRidesByDriver(driverId: number): Observable<any[]> {
-  const url = `${this.baseUrl}/${driverId}/confirmed`;
+  getCompletedRidesByDriver(driverId: number): Observable<any[]> {
+  const url = `${this.baseUrl}/${driverId}/completed`;
   const headers = new HttpHeaders({
     'Content-Type': 'application/json',
     Authorization: `Bearer ${this.getAuthToken() || ''}`
@@ -263,8 +272,51 @@ export class DriverService {
   return this.httpClient.get<any[]>(url, { headers });
 }
 
+// normal implementation
+
+  getOngoingRidesByDriver(driverId: number): Observable<any[]> {
+    // const url = `http://localhost:8089/ride/${driverId}/ongoing`;
+    const url = `${this.baseUrl}/${driverId}/ongoing`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.getAuthToken() || ''}`
+    });
+    return this.httpClient.get<any[]>(url, { headers });
+  }
+
+  completeRide(rideId: number, driverId: number): Observable<any> {
+    const url = `${this.baseUrl}/completeride/${rideId}/${driverId}`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.getAuthToken() || ''}`
+    });
+    return this.httpClient.post(url, {}, { headers });
+  }
 
 
+    // Forgot password - verify email and phone number
+  verifyForgotPasswordCredentials(email: string, phoneNumber: string): Observable<HttpResponse<{message: string, driver_id: string}>> {
+    const url = `${this.baseUrl}/forgotpassword`;
+    const forgotPasswordData = { email, phoneNumber };
+   
+    this.logApiRequest('POST', url, forgotPasswordData);
+   
+    return this.httpClient.post<{message: string, driver_id: string}>(url, forgotPasswordData, {
+      observe: 'response'
+    });
+  }
+ 
+  // Change password after OTP verification
+  changePassword(driverData: { driverId: string , passwordHash: string }): Observable<HttpResponse<{message: string}>> {
+    const url = `${this.baseUrl}/changepassword`;
+   
+    this.logApiRequest('PUT', url, driverData);
+   
+    return this.httpClient.put<{message: string}>(url, driverData, {
+      observe: 'response'
+    });
+  }
+ 
 }
 
 
