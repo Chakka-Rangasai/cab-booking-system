@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RideHistoryService } from '../../ride-history-service';
  
 @Component({
@@ -18,14 +18,28 @@ export class TripdetailsComponent implements OnInit {
   constructor(
     private rideService: RideHistoryService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
  
   ngOnInit(): void {
-    this.fetchRideHistory();
+    // Only run in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      this.fetchRideHistory();
+    } else {
+      // Handle SSR case
+      this.loading = false;
+      this.error = 'Loading...';
+    }
   }
  
   private fetchRideHistory(): void {
+    // Double-check we're in browser before accessing localStorage
+    if (!isPlatformBrowser(this.platformId)) {
+      console.warn('fetchRideHistory called in non-browser environment');
+      return;
+    }
+
     this.loading = true;
     this.error = null;
  
@@ -37,7 +51,7 @@ export class TripdetailsComponent implements OnInit {
       console.error('No user profile found in localStorage');
       this.error = 'User session not found. Please log in again.';
       this.loading = false;
-      setTimeout(() => {
+      setTimeout(() => { 
         this.router.navigate(['/main/userlogin']);
       }, 2000);
       return;

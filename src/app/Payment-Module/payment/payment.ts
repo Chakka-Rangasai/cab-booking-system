@@ -205,7 +205,7 @@ export class Payment implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.post('http://localhost:8086/payment/create', payload,{headers}).subscribe({
+    this.http.post('http://localhost:8080/payment-api/payment/create', payload,{headers}).subscribe({
       next: () => {
         if (this.paymentMethod === 'card') {
           this.Paymentformcard.reset();

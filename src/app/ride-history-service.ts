@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RideHistoryService {
-  private baseUrl = 'http://localhost:8089/ride/user'; // Update if needed
+  private baseUrl = 'http://localhost:8080/booking-api/ride/user'; // Update if needed
  
   constructor(private http: HttpClient) {}
  

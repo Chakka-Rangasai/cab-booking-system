@@ -22,7 +22,7 @@ export interface DriverInfo {
   providedIn: 'root'
 })
 export class DriverService {
-  private baseUrl = 'http://localhost:8087/driver';
+  private baseUrl = 'http://localhost:8080/driver-api/driver';
 
   constructor(private httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     console.log('DriverService initialized with baseUrl:', this.baseUrl);
@@ -167,7 +167,7 @@ export class DriverService {
 
   // Toggle driver availability
   toggleAvailability(driverId: number, isAvailable: boolean): Observable<HttpResponse<string>> {
-    const url = `${this.baseUrl}/${driverId}/${isAvailable}`;
+    const url = `${this.baseUrl}/check/${driverId}/${isAvailable}`;
     const headers = this.getAuthHeaders();
     
     this.logApiRequest('PATCH', url);
@@ -215,7 +215,7 @@ export class DriverService {
   const headers = new HttpHeaders({
       'Authorization': `Bearer ${drivetoken}`
     });
-    const url = `http://localhost:8077/reviews/driver/${driverId}/average`;
+    const url = `http://localhost:8080/review-api/reviews/driver/${driverId}/average`;
     this.logApiRequest('GET', url);
     return this.httpClient.get<number>(url,{headers});
   }
@@ -248,11 +248,11 @@ export class DriverService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${drivetoken}`
     });
-    return this.httpClient.get<any[]>("http://localhost:8087/driver/pending",{headers});
+    return this.httpClient.get<any[]>("http://localhost:8080/driver-api/driver/pending",{headers});
   }
 
   acceptRideRequest(rideId: number, driverId: number) {
-    const url = `http://localhost:8087/driver/acceptride/${rideId}/${driverId}`;
+    const url = `http://localhost:8080/driver-api/driver/acceptride/${rideId}/${driverId}`;
 
     const drivetoken =localStorage.getItem('driverToken')
     console.log("this is the driver token "+drivetoken);

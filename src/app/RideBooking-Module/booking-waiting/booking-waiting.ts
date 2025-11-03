@@ -140,7 +140,7 @@ export class BookingWaiting implements OnInit, OnDestroy {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    this.http.get<string[] | null>(`http://localhost:8086/payment/getpaymentstatusforride/${requestId}`,{headers}).subscribe({
+    this.http.get<string[] | null>(`http://localhost:8080/payment-api/payment/getpaymentstatusforride/${requestId}`,{headers}).subscribe({
       next: (status) => {
         this.paymentDone = status?.[0] === 'SUCCESS';
       },
@@ -232,7 +232,7 @@ export class BookingWaiting implements OnInit, OnDestroy {
     });
     
     // Submit rating to backend
-    this.http.post(`http://localhost:8077/reviews/${driverId}`, ratingData,{headers}).subscribe({
+    this.http.post(`http://localhost:8080/review-api/reviews/${driverId}`, ratingData,{headers}).subscribe({
       next: (response) => {
         console.log('Rating submitted successfully:', response);
         this.isRatingSubmitted = true;
@@ -258,7 +258,7 @@ export class BookingWaiting implements OnInit, OnDestroy {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.get<number>(`http://localhost:8077/reviews/driver/${driverId}/average`,{headers}).subscribe({
+    this.http.get<number>(`http://localhost:8080/review-api/reviews/driver/${driverId}/average`,{headers}).subscribe({
       next: (averageRating) => {
         this.driverAverageRating = averageRating || 0;
         console.log(`Driver average rating: ${this.driverAverageRating}`);

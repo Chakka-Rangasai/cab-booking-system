@@ -47,7 +47,7 @@ export interface BookingData {
   providedIn: 'root'
 })
 export class UserBooking {
-  private apiUrl = 'http://localhost:8088/user/createride';
+  private apiUrl = 'http://localhost:8080/user-api/user/createride';
 
   constructor(private http: HttpClient) {}
 

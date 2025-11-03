@@ -24,14 +24,14 @@ export class RidePollingService {
 
     this.stopPolling(); // Cancel any existing polling
 
-    this.pollingSubscription = timer(0, 10000).pipe(
+    this.pollingSubscription = timer(0, 5000).pipe(
       switchMap(() => {
         // Double-check we're still in browser before making HTTP request
         if (!isPlatformBrowser(this.platformId)) {
           return EMPTY;
         }
         
-        return this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`,
+        return this.http.get(`http://localhost:8080/user-api/user/${userId}/request/${requestId}`,
           {
           headers: {
                          'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
@@ -66,7 +66,7 @@ export class RidePollingService {
               
               // Only fetch driver details if we don't have them yet
               if (!currentDetails || !currentDetails.driver) {
-                this.http.get(`http://localhost:8087/driver/${res.acceptedDriverId}`,
+                this.http.get(`http://localhost:8080/driver-api/driver/${res.acceptedDriverId}`,
                   {
                     headers: {
                          'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
@@ -117,7 +117,7 @@ export class RidePollingService {
       return;
     }
 
-  this.http.get(`http://localhost:8088/user/${userId}/request/${requestId}`,{
+  this.http.get(`http://localhost:8080/user-api/user/${userId}/request/${requestId}`,{
     headers: {
                          'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
             }

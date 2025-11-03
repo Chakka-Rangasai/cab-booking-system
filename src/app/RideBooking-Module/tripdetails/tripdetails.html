@@ -2,7 +2,17 @@
   <div class="content-wrapper">
     <h2>Ride History</h2>
    
-    <div class="table-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loader-container">
+      <div class="loader">
+        <div class="spinner"></div>
+        <p>Loading your ride history...</p>
+      </div>
+    </div>
+
+
+    <!-- Content -->
+    <div *ngIf="!loading && !error" class="table-container">
       <table *ngIf="rideHistory.length > 0">
         <thead>
           <tr>
@@ -27,7 +37,7 @@
       </table>
      
       <div *ngIf="rideHistory.length === 0" class="empty-state">
-        <div class="icon"></div>
+        <div class="icon">🚗</div>
         <h3>No Rides Yet</h3>
         <p>Your ride history will appear here once you start booking rides.</p>
       </div>
