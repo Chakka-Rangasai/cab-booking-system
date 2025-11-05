@@ -117,7 +117,6 @@ export class DriverDetails implements OnInit {
       if (storedDriver && token) {
         this.driver = JSON.parse(storedDriver);
         if (this.driver) {
-          this.ensureDriverFlags(this.driver);
           this.fetchAverage();
           this.editedDriver = this.createDriverCopy(this.driver);
         }
@@ -158,12 +157,12 @@ export class DriverDetails implements OnInit {
     this.driverService.getConfirmedRidesByDriver(this.driver.driverId).subscribe({
       next: (rides) => {
         this.rideHistory = rides.map(ride => ({
-          date: new Date().toLocaleDateString(), // You can replace this with actual ride date if available
+          date: new Date().toLocaleDateString(),
           pickup: ride.origin,
           drop: ride.destination,
           fare: ride.amount,
-          customerRating: 4.8, // Placeholder if rating is not available
-          duration: ride.distance + ' km' // Or calculate duration if available
+          customerRating: 4.8, 
+          duration: ride.distance + ' km' 
         }));
         console.log('✅ Confirmed rides loaded:', this.rideHistory);
         this.cdr.detectChanges();
@@ -185,7 +184,7 @@ export class DriverDetails implements OnInit {
       next: (val: number) => {
         this.averageRating = typeof val === 'number' ? val : Number(val);
         console.log('fetchAverage success raw:', val, 'stored averageRating:', this.averageRating);
-        // Force change detection to update UI immediately
+        
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -195,13 +194,7 @@ export class DriverDetails implements OnInit {
     });
   }
 
-  // Ensure flags exist (no legacy Available/Verified handling now)
-  private ensureDriverFlags(driver: any) {
-    console.log('ensureDriverFlags input:', driver);
-    if (driver.isAvailable === undefined) driver.isAvailable = true;
-    if (driver.isVerified === undefined) driver.isVerified = true;
-    console.log('ensureDriverFlags after normalization:', driver);
-  }
+
 
   // Toggle availability with backend integration
   toggleAvailability() {
@@ -243,7 +236,6 @@ export class DriverDetails implements OnInit {
     this.driverService.updateDriverProfile(this.editedDriver).subscribe({
       next: (resp: any) => {
         this.driver = resp.body!;
-        this.ensureDriverFlags(this.driver);
         this.editedDriver = this.createDriverCopy(this.driver!);
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('driverInfo', JSON.stringify(this.driver));
@@ -251,6 +243,8 @@ export class DriverDetails implements OnInit {
         this.isEditing = false;
         this.isLoading = false;
         alert('Profile successfully updated');
+        // Navigate to driver navigation (dashboard) after successful profile update
+        this.router.navigate(['/drivernav']);
       },
       error: () => {
         this.isLoading = false;
@@ -259,55 +253,6 @@ export class DriverDetails implements OnInit {
     });
   }
 
-  // Ride booking methods with better functionality
-  // acceptRide(ride: any) {
-  //   console.log('🚗 Accepting ride:', ride);
-    
-  //   // Simulate ride acceptance
-  //   const confirmAccept = confirm(`Accept ride from ${ride.pickup} to ${ride.drop}?\nFare: ₹${ride.fare}\nCustomer: ${ride.customerName || 'Unknown'}`);
-    
-  //   if (confirmAccept) {
-  //     // Remove from requests
-  //     this.rideRequests = this.rideRequests.filter(r => r.id !== ride.id);
-      
-  //     // Add to history
-  //     const today = new Date();
-  //     const dateStr = today.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-      
-  //     this.rideHistory.unshift({
-  //       date: dateStr,
-  //       pickup: ride.pickup,
-  //       drop: ride.drop,
-  //       fare: ride.fare,
-  //       customerRating: ride.customerRating || 4.5,
-  //       duration: ride.estimatedTime + ' min'
-  //     });
-      
-  //     alert(`✅ Ride accepted! Navigate to pickup location: ${ride.pickup}`);
-      
-  //     // TODO: Integrate with backend ride acceptance API
-  //     // this.driverService.acceptRide(ride.id).subscribe(...)
-  //   }
-  // }
-
-  // acceptRide(ride: any) {
-  //   const confirmAccept = confirm(`Accept ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);
-  //   if (confirmAccept) {
-  //     this.pendingRides = this.pendingRides.filter(r => r.requestId !== ride.requestId);
-  //     const today = new Date();
-  //     const dateStr = today.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
-  //     this.rideHistory.unshift({
-  //       date: dateStr,
-  //       pickup: ride.origin,
-  //       drop: ride.destination,
-  //       fare: ride.amount,
-  //       customerRating: 4.5,
-  //       duration: '—'
-  //     });
-  //     alert(`✅ Ride accepted! Navigate to pickup location: ${ride.origin}`);
-  //     // TODO: Integrate with backend ride acceptance API
-  //   }
-  // }
 
 acceptRide(ride: any) {
   const confirmAccept = confirm(`Accept ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);
@@ -325,63 +270,27 @@ acceptRide(ride: any) {
         customerRating: 4.5,
         duration: '—'
       });
-      alert(`✅ Ride accepted! Navigate to pickup location: ${ride.origin}`);
+      alert(` Ride accepted! Navigate to pickup location: ${ride.origin}`);
     
   //this.ridePollingService.pollConfirmedRide(this.driver.driverId, ride.requestId);
     },
     error: (err) => {
       console.error('Failed to accept ride:', err);
-      alert('❌ Failed to accept ride. Please try again.');
+      alert(' Failed to accept ride. Please try again.');
     }
   });
 }
 
 
-  // rejectRide(ride: any) {
-  //   console.log('❌ Rejecting ride:', ride);
-    
-  //   const confirmReject = confirm(`Reject ride from ${ride.pickup} to ${ride.drop}?\nFare: ₹${ride.fare}`);
-    
-  //   if (confirmReject) {
-  //     // Remove from requests
-  //     this.rideRequests = this.rideRequests.filter(r => r.id !== ride.id);
-  //     alert('❌ Ride rejected. Looking for more requests...');
-      
-  //     // TODO: Integrate with backend ride rejection API  
-  //     // this.driverService.rejectRide(ride.id).subscribe(...)
-  //   }
-  // }
-
    rejectRide(ride: any) {
     const confirmReject = confirm(`Reject ride from ${ride.origin} to ${ride.destination}?\nFare: ₹${ride.amount}`);
     if (confirmReject) {
       this.pendingRides = this.pendingRides.filter(r => r.requestId !== ride.requestId);
-      alert('❌ Ride rejected. Looking for more requests...');
+      alert(' Ride rejected. Looking for more requests...');
       // TODO: Integrate with backend ride rejection API
     }
   }
-  // Method to simulate new ride requests (for testing)
-  // addMockRideRequest() {
-  //   const mockLocations = [
-  //     { pickup: 'Kalyani Nagar', drop: 'Bund Garden' },
-  //     { pickup: 'Yerawada', drop: 'MG Road' },
-  //     { pickup: 'Kharadi', drop: 'JM Road' },
-  //     { pickup: 'Wagholi', drop: 'Swargate' }
-  //   ];
-    
-  //   const randomLocation = mockLocations[Math.floor(Math.random() * mockLocations.length)];
-  //   const mockRide = {
-  //     id: Date.now(),
-  //     ...randomLocation,
-  //     fare: Math.floor(Math.random() * 300) + 150,
-  //     distance: (Math.random() * 10 + 5).toFixed(1),
-  //     estimatedTime: Math.floor(Math.random() * 20 + 15).toString(),
-  //     customerName: ['Rajesh P.', 'Sneha T.', 'Vikram S.', 'Anita R.'][Math.floor(Math.random() * 4)],
-  //     customerRating: Math.round((Math.random() * 0.5 + 4.5) * 10) / 10
-  //   };
-    
-  //   this.rideRequests.push(mockRide);
-  // }
+  
 
   // Enhanced logout with proper cleanup
   logout() {

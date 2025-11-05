@@ -24,22 +24,16 @@ export interface DriverInfo {
 export class DriverService {
   private baseUrl = 'http://localhost:8087/driver';
 
-  constructor(private httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
-    console.log('DriverService initialized with baseUrl:', this.baseUrl);
-  }
+  constructor(private httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {}
 
-  // Get JWT token from localStorage with logging
+  // Get JWT token from localStorage
   private getAuthToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
       // Try to get the driver token first, then fallback to authToken
       const driverToken = localStorage.getItem('driverToken');
       const authToken = localStorage.getItem('authToken');
-      const token = driverToken || authToken;
-      
-      console.log(' JWT Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
-      return token;
+      return driverToken || authToken;
     }
-    console.log('Running on server side - no localStorage access');
     return null;
   }
 
@@ -50,9 +44,6 @@ export class DriverService {
     
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
-      console.log(' Authorization header added:', `Bearer ${token.substring(0, 20)}...`);
-    } else {
-      console.log(' No token available - proceeding without Authorization header');
     }
     
     return headers;
@@ -60,34 +51,7 @@ export class DriverService {
 
   // Log API request details
   private logApiRequest(method: string, url: string, data?: any) {
-    console.log(` API ${method} Request:`, {
-      url: url,
-      timestamp: new Date().toISOString(),
-      data: data ? 'Data provided' : 'No data',
-      hasAuth: this.getAuthToken() ? 'Yes' : 'No'
-    });
-  }
-
-  // Log API response details
-  private logApiResponse(method: string, url: string, response: any, error?: any) {
-    if (error) {
-      console.error(` API ${method} Error Response:`, {
-        url: url,
-        timestamp: new Date().toISOString(),
-        status: error.status,
-        statusText: error.statusText,
-        error: error.error,
-        message: error.message
-      });
-    } else {
-      console.log(` API ${method} Success Response:`, {
-        url: url,
-        timestamp: new Date().toISOString(),
-        status: response.status,
-        statusText: response.statusText,
-        hasBody: response.body ? 'Yes' : 'No'
-      });
-    }
+    console.log(`🚀 ${method} ${url}`, data ? '(with data)' : '(no data)');
   }
 
   // Build payload matching backend Driver entity (capitalized field names)
@@ -105,24 +69,6 @@ export class DriverService {
       capacity: driver.capacity,
       isAvailable: driver.isAvailable,
       isVerified: driver.isVerified
-    };
-  }
-
-  // Normalize driver response from backend to handle field name variations
-  private normalizeDriverResponse(d: any): DriverInfo {
-    return {
-      driverId: d.driverId,
-      fullName: d.fullName,
-      email: d.email,
-      phoneNumber: d.phoneNumber,
-      passwordHash: d.passwordHash || '',
-      licenseNumber: d.licenseNumber,
-      vehicleModel: d.vehicleModel,
-      vehicleRegNo: d.vehicleRegNo,
-      vehicleColor: d.vehicleColor,
-      capacity: d.capacity,
-      isAvailable: d.isAvailable !== undefined ? d.isAvailable : true,
-      isVerified: d.isVerified !== undefined ? d.isVerified : true
     };
   }
 
@@ -152,16 +98,6 @@ export class DriverService {
     const headers = this.getAuthHeaders();
     const payload = this.buildDriverPayload(driverData);
     this.logApiRequest('POST', url, payload);
-    console.log('🔧 POST Update Profile Request Details:', {
-      url,
-      method: 'POST',
-      headers: {
-        Authorization: headers.get('Authorization') ? 'Bearer ***token***' : 'None',
-        'Content-Type': headers.get('Content-Type') || 'Default'
-      },
-      hasDriverData: !!driverData,
-      driverId: driverData.driverId
-    });
     return this.httpClient.post<DriverInfo>(url, payload, { headers, observe: 'response' });
   }
 
@@ -171,16 +107,6 @@ export class DriverService {
     const headers = this.getAuthHeaders();
     
     this.logApiRequest('PATCH', url);
-    console.log(' PATCH Request Details:', {
-      url: url,
-      method: 'PATCH',
-      headers: {
-        'Authorization': headers.get('Authorization') ? 'Bearer ***token***' : 'None',
-        'Content-Type': headers.get('Content-Type') || 'Default'
-      },
-      body: 'Empty object {}',
-      responseType: 'text'
-    });
     
     return this.httpClient.patch(url, {}, {
       headers: headers,
@@ -194,13 +120,6 @@ export class DriverService {
     const url = `${this.baseUrl}/auth/login`;
     const loginData = { email, password };
     
-    console.log(' Login Request:', {
-      url: url,
-      email: email,
-      timestamp: new Date().toISOString(),
-      hasPassword: !!password
-    });
-    
     this.logApiRequest('POST', url, { email: email, password: '***masked***' });
     
     return this.httpClient.post<{token: string, driver: DriverInfo}>(url, loginData, {
@@ -210,7 +129,7 @@ export class DriverService {
 
   // Get driver average rating (public by default, pass true to use auth)
   getDriverAverage(driverId: number, useAuth: boolean = false) {
-    const url = `${this.baseUrl}/reviews/driver/${driverId}/average`;
+    const url = `http://localhost:8077/reviews/driver/${driverId}/average`;
     this.logApiRequest('GET', url);
     if (useAuth) {
       return this.httpClient.get<number>(url, { headers: this.getAuthHeaders() });
@@ -231,8 +150,7 @@ export class DriverService {
   getCurrentDriverAverage() {
     const stored = this.getStoredDriver();
     if (!stored?.driverId) {
-      console.warn('getCurrentDriverAverage: No driverId in stored driver');
-      return this.httpClient.get<number>('about:blank'); // will error quickly if misused
+      return this.httpClient.get<number>('about:blank'); 
     }
     return this.getDriverAverage(stored.driverId);
   }
@@ -255,7 +173,28 @@ export class DriverService {
   return this.httpClient.get<any[]>(url, { headers });
 }
 
+  // Forgot password - verify email and phone number
+  verifyForgotPasswordCredentials(email: string, phoneNumber: string): Observable<HttpResponse<{message: string, driver_id: string}>> {
+    const url = `${this.baseUrl}/forgotpassword`;
+    const forgotPasswordData = { email, phoneNumber };
+    
+    this.logApiRequest('POST', url, forgotPasswordData);
+    
+    return this.httpClient.post<{message: string, driver_id: string}>(url, forgotPasswordData, { 
+      observe: 'response' 
+    });
+  }
 
+  // Change password after OTP verification
+  changePassword(driverData: { driverId: string , passwordHash: string }): Observable<HttpResponse<{message: string}>> {
+    const url = `${this.baseUrl}/changepassword`;
+    
+    this.logApiRequest('PUT', url, driverData);
+    
+    return this.httpClient.put<{message: string}>(url, driverData, { 
+      observe: 'response' 
+    });
+  }
 
 }
 

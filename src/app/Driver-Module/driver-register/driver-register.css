@@ -111,6 +111,30 @@ input:focus {
   font-weight: 500;
 }
 
+/* Field-specific error styling */
+.field-error {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.field-error span {
+  display: block;
+  line-height: 1.2;
+}
+
+/* Input field error styling */
+.ng-invalid.ng-touched {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.ng-valid.ng-touched {
+  border-color: #28a745 !important;
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
   .form-row {

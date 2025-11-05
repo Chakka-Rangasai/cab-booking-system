@@ -71,8 +71,8 @@
         <h3>Account Status</h3>
         <div class="info-item">
           <label>Verified:</label>
-          <span [class]="driver.isVerified ? 'status-verified' :'status-pending' ">
-            {{ driver.isVerified ? 'Verified'  : 'Pending' }}
+          <span [class]="driver.isVerified ?  'status-pending':'status-verified' ">
+            {{ driver.isVerified ?  'Pending' : 'Verified' }}
           </span>
           
         </div>

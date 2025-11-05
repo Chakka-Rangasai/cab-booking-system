@@ -31,19 +31,11 @@ export class DriverLoginComponent implements OnInit {
   ngOnInit() {
     // Check if already logged in
     if (this.isBrowser && localStorage.getItem('driverToken')) {
-      this.router.navigate(['/drivernav/']);
+      this.router.navigate(['/drivernav']);
     }
   }
 
-  private normalizeDriver(driver: any) {
-    if (!driver) return driver;
-    console.log('normalizeDriver raw from backend:', driver);
-    // Map backend field names correctly
-    if (driver.isAvailable === undefined) driver.isAvailable = true;
-    if (driver.isVerified === undefined) driver.isVerified = true;
-    console.log('normalizeDriver after normalization:', driver);
-    return driver;
-  }
+
 
   onLogin() {
     console.log('Login attempt started for email:', this.email);
@@ -72,29 +64,40 @@ export class DriverLoginComponent implements OnInit {
 
     this.driverService.loginDriver(this.email, this.password).subscribe({
       next: (response: any) => {
-        console.log('Login successful:', response);
+        console.log('✅ Driver login successful:', response);
+        this.loading = false;
         
         if (response && response.body && response.body.token) {
-          // Store the token
+          // Store the token and driver info
           if (this.isBrowser) {
             localStorage.setItem('driverToken', response.body.token);
             if (response.body.driver) {
-              const normalized = this.normalizeDriver(response.body.driver);
-              localStorage.setItem('driverInfo', JSON.stringify(normalized));
+              localStorage.setItem('driverInfo', JSON.stringify(response.body.driver));
+              console.log('✅ Stored driver info:', response.body.driver);
             }
+            console.log('✅ Token stored:', response.body.token.substring(0, 20) + '...');
           }
           
-          // Show success alert
-          alert('Login successful! Welcome to your dashboard.');
-          
-          // Navigate to driver details
-          this.router.navigate(['/driver-details']);
+          // Small delay to ensure localStorage is set before navigation
+          setTimeout(() => {
+            console.log('🚀 Navigating to /drivernav...');
+            this.router.navigate(['/drivernav']).then((success) => {
+              if (success) {
+                console.log('✅ Navigation to /drivernav successful');
+                alert('Login successful! Welcome to your dashboard.');
+              } else {
+                console.error('❌ Navigation to /drivernav failed');
+                this.errorMessage = 'Navigation failed. Please try refreshing the page.';
+              }
+            }).catch((error) => {
+              console.error('❌ Navigation error:', error);
+              this.errorMessage = 'Navigation error. Please try refreshing the page.';
+            });
+          }, 100);
         } else {
-          console.error('Login response missing token:', response);
+          console.error('❌ Login response missing token:', response);
           this.errorMessage = 'Login failed. Invalid response from server.';
-          alert('Login failed. Invalid response from server.');
         }
-        this.loading = false;
       },
       error: (error) => {
         console.error('Login error:', error);

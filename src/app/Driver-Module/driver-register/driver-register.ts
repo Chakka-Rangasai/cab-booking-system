@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,6 +12,8 @@ import { DriverService, DriverInfo } from '../../driver.service';
   styleUrls: ['./driver-register.css']
 })
 export class DriverRegister {
+  @ViewChild('driverForm', { static: false }) driverForm!: NgForm;
+  
   // Driver properties matching backend DriverInfo interface
   fullName: string = '';
   email: string = '';
@@ -48,70 +50,63 @@ export class DriverRegister {
     return password.length >= 8;
   }
 
-onRegisterDriver() {
-  this.errorMessage = '';
-  this.isLoading = true;
+onRegisterDriver(form?: NgForm) {
+  console.log('🎯 onRegisterDriver() called');
   
-  // Validate all required fields
-  if (!this.fullName.trim()) {
-    this.errorMessage = 'Please enter your full name';
-    this.isLoading = false;
+  // Use the form parameter if provided, otherwise fall back to ViewChild
+  const currentForm = form || this.driverForm;
+  
+  console.log('📝 Form reference:', !!currentForm);
+  console.log('📝 Form valid:', currentForm?.valid);
+  console.log('📝 Form value:', currentForm?.value);
+  console.log('📝 Component values:', {
+    fullName: this.fullName,
+    email: this.email,
+    phoneNumber: this.phoneNumber
+  });
+  
+  this.errorMessage = '';
+  
+  // Debug form errors if form exists
+  if (currentForm) {
+    console.log('📝 Form errors:', currentForm.errors);
+    if (currentForm.controls) {
+      Object.keys(currentForm.controls).forEach(key => {
+        const control = currentForm.controls[key];
+        if (control.invalid) {
+          console.log(`❌ Field ${key} is invalid:`, control.errors);
+        }
+      });
+    }
+  }
+  
+  // Check if form exists and is valid
+  if (!currentForm || !currentForm.valid) {
+    this.errorMessage = 'Please fill all required fields correctly.';
+    console.log('❌ Form is invalid or missing');
+    // Mark all fields as touched to show validation errors
+    if (currentForm && currentForm.controls) {
+      Object.keys(currentForm.controls).forEach(key => {
+        currentForm.controls[key].markAsTouched();
+      });
+    }
     return;
   }
-
-  if (!this.isValidEmail(this.email)) {
-    this.errorMessage = 'Please enter a valid email address';
-    this.isLoading = false;
-    return;
-  }
-
-  if (!this.isValidPassword(this.password)) {
-    this.errorMessage = 'Password must be at least 8 characters long';
-    this.isLoading = false;
-    return;
-  }
-
+  
+  // Additional validation for password confirmation (since it's not easily done in template)
   if (this.password !== this.confirmPassword) {
     this.errorMessage = 'Passwords do not match';
-    this.isLoading = false;
     return;
   }
 
-  if (!this.isValidPhoneNumber(this.phoneNumber)) {
-    this.errorMessage = 'Please enter a valid 10-digit Indian phone number';
-    this.isLoading = false;
-    return;
-  }
-
-  if (!this.licenseNumber.trim()) {
-    this.errorMessage = 'Please enter your license number';
-    this.isLoading = false;
-    return;
-  }
-
-  if (!this.vehicleModel.trim()) {
-    this.errorMessage = 'Please enter your vehicle model';
-    this.isLoading = false;
-    return;
-  }
-
-  if (!this.vehicleRegNo.trim()) {
-    this.errorMessage = 'Please enter your vehicle registration number';
-    this.isLoading = false;
-    return;
-  }
-
-  if (!this.vehicleColor.trim()) {
-    this.errorMessage = 'Please enter your vehicle color';
-    this.isLoading = false;
-    return;
-  }
-
+  // Additional validation for capacity range
   if (this.capacity < 1 || this.capacity > 8) {
     this.errorMessage = 'Vehicle capacity must be between 1 and 8';
-    this.isLoading = false;
     return;
   }
+
+  // Set loading state
+  this.isLoading = true;
 
   // Create driver data object matching backend Driver entity exactly
   const driverData = {
@@ -141,19 +136,46 @@ onRegisterDriver() {
     },
     error: (error: any) => {
       console.error('❌ Driver registration failed:', error);
+
       this.isLoading = false;
       
-      if (error.status === 400) {
-        this.errorMessage = 'Registration failed: Please check your input data.';
+      // Handle specific backend error messages
+      if (error.status === 500) {
+        let errorMessage = '';
+        
+        // Try different ways to extract the error message
+        if (error.error && typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'Unknown server error';
+        }
+        
+        console.log(' Extracted error message:', errorMessage);
+        
+        if (errorMessage.includes('Driver with this email already exists')) {
+          this.errorMessage = 'This email address is already registered. Please use a different email or try logging in.';
+        } else if (errorMessage.includes('Driver with this license number already exists')) {
+          this.errorMessage = 'This license number is already registered. Please verify your license number.';
+        } else {
+          this.errorMessage =  errorMessage;
+        }
+      } else if (error.status === 400) {
+        this.errorMessage = 'Registration failed: Please check your input data and ensure all fields are valid.';
       } else if (error.status === 409) {
-        this.errorMessage = 'Registration failed: Email or phone number already exists.';
+        this.errorMessage = 'Registration failed: Email or license number already exists.';
       } else if (error.status === 0) {
-        this.errorMessage = 'Network error. Please check if backend is working properly';
-      } else if (error.status === 500) {
-        this.errorMessage = 'Server error. Please try again later.';
+        this.errorMessage = 'Network error: Unable to connect to server. Please check your internet connection.';
       } else {
         this.errorMessage = `Registration failed: Server error (${error.status}). Please try again later.`;
       }
+      
+      // Always show an alert for debugging
+      alert('Registration Error: ' + this.errorMessage);
+      console.log('🚨 Error message set to:', this.errorMessage);
     }
   });
 }
@@ -168,7 +190,7 @@ resetForm() {
   this.vehicleModel = '';
   this.vehicleRegNo = '';
   this.vehicleColor = '';
-  this.capacity = 2;
+  this.capacity = 4; // Match default value
   this.errorMessage = '';
   this.isLoading = false;
 }
