@@ -60,7 +60,3 @@ userLoginObj = {
     this.router.navigate(['/main/userresetpassword']);
   }
 }
-
-
-
-

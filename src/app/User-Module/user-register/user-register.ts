@@ -23,20 +23,6 @@ export class UserRegister {
   constructor(private router: Router,private userService:UserService) {
   }
  
-  // onRegister(form: NgForm) {
-  //   if (form.valid) {
-  //      this.userService.getUserDetailsObj(this.user);
-  //      if(this.userService.responseMessage==="User registered successfully."){
-  //       alert("Registration successfull");
-  //       this.router.navigate(['/main/userlogin']);
-  //      }
-  //      else{
-  //       alert(this.userService.responseMessage);
-  //     }
-  //   } else {
-  //     alert('Please correct the errors before submitting.');
-  //   }
-  // }
   onRegister(form: NgForm) {
   if (form.valid) {
     this.userService.getUserDetailsObj(this.user).subscribe({

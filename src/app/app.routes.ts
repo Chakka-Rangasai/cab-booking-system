@@ -13,11 +13,8 @@ import { DriverSetNewPassword } from './Driver-Module/driver-set-new-password/dr
 import { DriverDetails } from './Driver-Module/driver-details/driver-details';
 import { UserhomeNav } from './User-Module/userhome-nav/userhome-nav';
 import { Cnfbooking } from './RideBooking-Module/cnfbooking/cnfbooking';
-import { BookingConfirmationCard } from './RideBooking-Module/booking-confirmation-card/booking-confirmation-card';
 import { TermsConditions } from './Home-Module/terms-conditions/terms-conditions';
 import { Contactus } from './Home-Module/contactus/contactus';
-import path from 'node:path'; 
-import { Component } from '@angular/core';
 import { Main } from './Home-Module/main/main';
 import { Home } from './Home-Module/home/home';
 import { DrivermainNav } from './Driver-Module/drivermain-nav/drivermain-nav';
@@ -98,7 +95,6 @@ export const routes: Routes = [
        { path:'payment',component:Payment},
       {path:'paymentsuccess',component:PaymentSuccessComponent},
       {path:'booking-waiting',component:BookingWaiting},
-      { path:'booking-confirmation',component:BookingConfirmationCard}
     ]
   },
     { path: '', redirectTo: 'main', pathMatch: 'full' }

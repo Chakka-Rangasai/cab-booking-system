@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 export interface DriverInfo {
   driverId?: number;
@@ -18,11 +18,13 @@ export interface DriverInfo {
   isVerified?: boolean;
 }
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class DriverService {
   private baseUrl = 'http://localhost:8080/driver-api/driver';
+
 
   constructor(private httpClient: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     console.log('DriverService initialized with baseUrl:', this.baseUrl);
@@ -191,7 +193,7 @@ export class DriverService {
 
   // Driver login with JWT
   loginDriver(email: string, password: string): Observable<HttpResponse<{token: string, driver: DriverInfo}>> {
-    const url = `${this.baseUrl}/auth/hello/login`;
+    const url = `${this.baseUrl}/auth/login`;
     const loginData = { email, password };
     
     console.log(' Login Request:', {
@@ -293,28 +295,25 @@ export class DriverService {
     return this.httpClient.post(url, {}, { headers });
   }
 
-
-    // Forgot password - verify email and phone number
-  verifyForgotPasswordCredentials(email: string, phoneNumber: string): Observable<HttpResponse<{message: string, driver_id: string}>> {
-    const url = `${this.baseUrl}/forgotpassword`;
-    const forgotPasswordData = { email, phoneNumber };
-   
-    this.logApiRequest('POST', url, forgotPasswordData);
-   
-    return this.httpClient.post<{message: string, driver_id: string}>(url, forgotPasswordData, {
+// Forgot password - verify email and phone number
+forgetPasswordCredentials(userForgotPasswordObj: any): Observable<HttpResponse<{ message: string, user_id?: string }>> {
+  return this.httpClient.post<{ message: string, user_id?: string }>(
+    `${this.baseUrl}/forgotpassword`,
+    userForgotPasswordObj,
+    {
       observe: 'response'
-    });
-  }
- 
-  // Change password after OTP verification
-  changePassword(driverData: { driverId: string , passwordHash: string }): Observable<HttpResponse<{message: string}>> {
-    const url = `${this.baseUrl}/changepassword`;
+    }
+  );
+}
+    updateUserPassword(newPassworddd: any): Observable<HttpResponse<{ message: string }>> {
    
-    this.logApiRequest('PUT', url, driverData);
-   
-    return this.httpClient.put<{message: string}>(url, driverData, {
-      observe: 'response'
-    });
+    return this.httpClient.put<{ message: string }>(
+       `${this.baseUrl}/changepassword`,
+      newPassworddd,
+      {
+        observe: 'response'
+      }
+    );
   }
  
 }

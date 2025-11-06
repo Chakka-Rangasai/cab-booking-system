@@ -93,11 +93,12 @@ export class Cnfbooking implements OnInit {
     const popup = new mapboxgl.Popup({ offset: 25 }).setText(label);
     new mapboxgl.Marker().setLngLat(coords).setPopup(popup).addTo(this.map);
   }
-
+  // async is used to tell angular that this methods needs a promise means an asynchronous data to go further .
   async drawRoute() {
     const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${this.originCoords.join(',')};${this.destinationCoords.join(',')}?geometries=geojson&access_token=${environment.mapbox.accessToken}`;
 
     try {
+      // await is used to make the excecution stop only at this line only in this method until i get the full response as promise.
       const res = await fetch(url);
       const data = await res.json();
 
