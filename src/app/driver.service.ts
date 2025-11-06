@@ -191,7 +191,7 @@ export class DriverService {
 
   // Driver login with JWT
   loginDriver(email: string, password: string): Observable<HttpResponse<{token: string, driver: DriverInfo}>> {
-    const url = `${this.baseUrl}/auth/login`;
+    const url = `${this.baseUrl}/auth/hello/login`;
     const loginData = { email, password };
     
     console.log(' Login Request:', {

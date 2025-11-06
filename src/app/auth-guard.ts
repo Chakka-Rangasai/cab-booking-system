@@ -18,10 +18,10 @@ export class AuthGuard implements CanActivate {
       console.log('AuthGuard: SSR context - allowing navigation');
       return true; // Allow navigation, will be checked again on client-side
     }
-
+ 
     // Browser context - check token
     console.log('AuthGuard: Browser context - checking token');
-    
+   
     // Add small delay to ensure DOM is ready
     return of(null).pipe(
       delay(1),
@@ -41,12 +41,11 @@ export class AuthGuard implements CanActivate {
           console.log('AuthGuard: No token found, redirecting to login');
           this.router.navigate(['/main/userlogin']);
           alert("Please login to access!");
-          
+         
           return false;
         }
       })
     );
   }
 }
- 
  
