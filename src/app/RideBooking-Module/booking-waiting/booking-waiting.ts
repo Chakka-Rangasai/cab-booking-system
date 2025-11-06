@@ -10,24 +10,22 @@ import {
 import {
   ActivatedRoute,
   Router,
-  RouterModule,
-  NavigationStart
+  RouterModule
 } from '@angular/router';
 import {
   CommonModule,
-  isPlatformBrowser,
-  LocationStrategy
+  isPlatformBrowser
 } from '@angular/common';
 import { RidePollingService } from '../../ride-polling-service';
 import { Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-booking-waiting',
   standalone: true,
-  imports: [CommonModule, RouterModule,FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './booking-waiting.html',
   styleUrls: ['./booking-waiting.css']
 })
@@ -39,11 +37,12 @@ export class BookingWaiting implements OnInit, OnDestroy {
   driverReview: { rating: number; reviewText?: string } = {
     rating: 0,
     reviewText: ''
-  }
+  };
   driverAverageRating: number = 0;
   isRatingSubmitted: boolean = false;
 
   private destroy$ = new Subject<void>();
+  private popStateHandler = () => this.router.navigate(['/userhomenav']);
 
   constructor(
     private route: ActivatedRoute,
@@ -52,7 +51,6 @@ export class BookingWaiting implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private ridePollingService: RidePollingService,
     private http: HttpClient,
-    private locationStrategy: LocationStrategy,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -72,11 +70,10 @@ export class BookingWaiting implements OnInit, OnDestroy {
 
     this.route.queryParamMap.subscribe(params => {
       this.bookingId = Number(params.get('id'));
-      
-      // Store booking ID in multiple places for reliable retrieval
+
       localStorage.setItem('requestId', String(this.bookingId));
       sessionStorage.setItem('currentBookingId', String(this.bookingId));
-      
+
       const userId = (JSON.parse(userProfile) as { userId: number }).userId;
       const requestId = this.bookingId;
 
@@ -94,7 +91,6 @@ export class BookingWaiting implements OnInit, OnDestroy {
                 case 'COMPLETED':
                   this.status = 'completed';
                   console.log('✅ Ride completed');
-                  // Load driver's average rating when ride is completed
                   this.loadDriverAverageRating();
                   break;
                 case 'ONGOING':
@@ -114,33 +110,16 @@ export class BookingWaiting implements OnInit, OnDestroy {
         });
     });
 
-    // Block navigation if payment not done
-    this.router.events
-      .pipe(takeUntil(this.destroy$), filter(event => event instanceof NavigationStart))
-      .subscribe(event => {
-        const nav = event as NavigationStart;
-        if (!this.paymentDone && !nav.url.includes('/userhomenav/payment')) {
-          alert('❌ You must complete the payment before navigating to another page.');
-          this.router.navigateByUrl(this.router.url);
-        }
-      });
-
-    // Block browser back button
-    history.pushState(null, '', location.href);
-    this.locationStrategy.onPopState(() => {
-      if (!this.paymentDone) {
-        alert('⚠️ You must complete the payment before going back.');
-        history.pushState(null, '', location.href);
-      }
-    });
+    // Redirect to home on browser back or refresh
+    window.addEventListener('popstate', this.popStateHandler);
   }
 
   checkPaymentStatus(requestId: number): void {
-     const token =localStorage.getItem('jwtToken')
+    const token = localStorage.getItem('jwtToken');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    this.http.get<string[] | null>(`http://localhost:8080/payment-api/payment/getpaymentstatusforride/${requestId}`,{headers}).subscribe({
+    this.http.get<string[] | null>(`http://localhost:8080/payment-api/payment/getpaymentstatusforride/${requestId}`, { headers }).subscribe({
       next: (status) => {
         this.paymentDone = status?.[0] === 'SUCCESS';
       },
@@ -152,6 +131,8 @@ export class BookingWaiting implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('popstate', this.popStateHandler);
+
     this.status = 'waiting';
     this.bookingDetails = null;
     this.destroy$.next();
@@ -162,23 +143,18 @@ export class BookingWaiting implements OnInit, OnDestroy {
   }
 
   goHome(): void {
-    if (this.paymentDone) {
-      this.router.navigate(['/userhomenav']);
-    } else {
-      alert('❌ You must complete the payment before going home.');
-    }
+    this.router.navigate(['/userhomenav']);
   }
 
   goToPayment(): void {
-    // Store booking ID before navigation
     localStorage.setItem('requestId', String(this.bookingId));
     sessionStorage.setItem('currentBookingId', String(this.bookingId));
-    
+
     this.router.navigate(['/userhomenav/payment'], {
       queryParams: {
         requestId: this.bookingId,
         amount: this.bookingDetails?.amount,
-        returnTo: 'booking-waiting' // Flag to indicate where to return after payment
+        returnTo: 'booking-waiting'
       }
     });
   }
@@ -187,18 +163,11 @@ export class BookingWaiting implements OnInit, OnDestroy {
     this.driverReview.rating = rating;
     console.log(`User rated driver: ${rating} stars`);
     console.log('Review text:', this.driverReview.reviewText);
-    // alert(`Thank you for rating ${rating} stars!`);
-    // TODO: Send rating to backend
   }
 
-  onStarHover(rating: number): void {
-    // Optional: Add temporary visual feedback on hover
-    // Can be used to show preview of rating
-  }
+  onStarHover(rating: number): void {}
 
-  onStarLeave(): void {
-    // Optional: Remove hover effects
-  }
+  onStarLeave(): void {}
 
   submitDriverRating(): void {
     if (this.driverReview.rating === 0) {
@@ -220,24 +189,20 @@ export class BookingWaiting implements OnInit, OnDestroy {
     const ratingData = {
       rating: this.driverReview.rating,
       reviewText: this.driverReview.reviewText?.trim() || '',
-      // requestId: this.bookingId,
-      //userId: this.getUserId(),
       driverId: driverId
     };
 
     console.log('Submitting driver rating:', ratingData);
-    const token =localStorage.getItem('jwtToken')
+    const token = localStorage.getItem('jwtToken');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    
-    // Submit rating to backend
-    this.http.post(`http://localhost:8080/review-api/reviews/${driverId}`, ratingData,{headers}).subscribe({
+
+    this.http.post(`http://localhost:8080/review-api/reviews/${driverId}`, ratingData, { headers }).subscribe({
       next: (response) => {
         console.log('Rating submitted successfully:', response);
         this.isRatingSubmitted = true;
         alert('Rating submitted successfully! Thank you for your feedback.');
-        // Refresh the average rating
         this.loadDriverAverageRating();
       },
       error: (error) => {
@@ -253,12 +218,13 @@ export class BookingWaiting implements OnInit, OnDestroy {
       console.warn('Driver ID not available for loading average rating');
       return;
     }
-     const token =localStorage.getItem('jwtToken')
+
+    const token = localStorage.getItem('jwtToken');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.get<number>(`http://localhost:8080/review-api/reviews/driver/${driverId}/average`,{headers}).subscribe({
+    this.http.get<number>(`http://localhost:8080/review-api/reviews/driver/${driverId}/average`, { headers }).subscribe({
       next: (averageRating) => {
         this.driverAverageRating = averageRating || 0;
         console.log(`Driver average rating: ${this.driverAverageRating}`);
@@ -269,7 +235,6 @@ export class BookingWaiting implements OnInit, OnDestroy {
       }
     });
   }
-
 
   bookAnotherRide(): void {
     this.router.navigate(['/userhomenav']);

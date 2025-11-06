@@ -4,6 +4,7 @@
   <div class="method-selector">
     <button [class.active]="paymentMethod === 'card'" (click)="selectMethod('card')">Card</button>
     <button [class.active]="paymentMethod === 'upi'" (click)="selectMethod('upi')">UPI</button>
+    <button [class.active]="paymentMethod === 'cash'" (click)="selectMethod('cash')">Cash</button>
   </div>
 
   <!-- Card Form -->
@@ -14,27 +15,30 @@
       <label>Cardholder Name</label>
       <input formControlName="name" />
     </div>
+
     <div class="form-group">
       <label>Card Number</label>
       <input formControlName="cardnumber" />
     </div>
     <div *ngIf="Paymentformcard.get('cardnumber')?.invalid && Paymentformcard.get('cardnumber')?.touched" class="alert-box">
-  Card number must be exactly 12 digits.
-</div>
+      Card number must be exactly 12 digits.
+    </div>
+
     <div class="form-group">
       <label>Expiry Date</label>
       <input formControlName="expiry" />
     </div>
     <div *ngIf="Paymentformcard.get('expiry')?.invalid && Paymentformcard.get('expiry')?.touched" class="alert-box">
-  Expiry must be in MM/YYYY format.
-</div>
+      Expiry must be in MM/YYYY format.
+    </div>
+
     <div class="form-group">
       <label>CVV</label>
       <input formControlName="cvv" />
     </div>
     <div *ngIf="Paymentformcard.get('cvv')?.invalid && Paymentformcard.get('cvv')?.touched" class="alert-box">
-  CVV must be exactly 3 digits.
-</div>
+      CVV must be exactly 3 digits.
+    </div>
 
     <button type="submit" class="pay-btn">Pay ₹ {{amount}}</button>
     <p class="note">This is a demo page. No actual card transaction will occur.</p>
@@ -43,11 +47,12 @@
   <!-- UPI Form -->
   <form *ngIf="paymentMethod === 'upi'" [formGroup]="Paymentformupi" (ngSubmit)="submitUpi()">
     <div *ngIf="upiErrorMessage" class="alert-box">{{ upiErrorMessage }}</div>
-    
+
     <div class="form-group">
       <label>Name</label>
       <input formControlName="name" />
     </div>
+
     <div class="form-group">
       <label>UPI ID</label>
       <input formControlName="upiid" />
@@ -56,4 +61,11 @@
     <button type="submit" class="pay-btn">Pay ₹ {{amount}}</button>
     <p class="note">This is a demo page. No actual UPI transaction will occur.</p>
   </form>
+
+  <!-- Cash Option -->
+  <div *ngIf="paymentMethod === 'cash'" class="cash-confirmation">
+    <p>💵 You have selected <strong>Cash</strong> as your payment method.</p>
+    <p>Please pay ₹{{amount}} directly to the driver at the end of your ride.</p>
+    <button (click)="submitCash()" class="pay-btn">Confirm Cash Payment</button>
+  </div>
 </div>
